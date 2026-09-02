@@ -412,18 +412,26 @@ window.loadSystemGuide = function() {
       <div class="flex items-center justify-between flex-wrap gap-3">
         <!-- Search Input -->
         <div class="form-group mb-0" style="flex:1;min-width:280px;position:relative">
-          <input type="text" class="form-control" id="guide-search-input" placeholder="🔍 Cari kegunaan fitur (contoh: SLA, Telegram, Force Logout, RMM, DNS, CAB)..." oninput="filterGuideFeatures()">
+          <input type="text" class="form-control" id="guide-search-input" placeholder="🔍 Cari kegunaan fitur (contoh: SLA, Tiket, Katalog, Knowledge Base)..." oninput="filterGuideFeatures()">
         </div>
 
         <!-- Filter Category Tabs -->
         <div class="flex gap-1.5 flex-wrap" id="guide-category-filters">
-          <button class="btn btn-xs btn-primary guide-cat-btn" data-category="all" onclick="filterGuideCategory('all', this)">Semua Modul (${window.featuresData.length})</button>
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="myrole" onclick="filterGuideRole('${userRole}', this)">Peran Saya</button>
+          <button class="btn btn-xs ${userRole !== 'admin' ? 'btn-primary' : 'btn-secondary'} guide-cat-btn" data-category="myrole" onclick="filterGuideRole('${userRole}', this)">
+            ⭐ Fitur Akun Saya (${userRole.toUpperCase()})
+          </button>
+          <button class="btn btn-xs ${userRole === 'admin' ? 'btn-primary' : 'btn-secondary'} guide-cat-btn" data-category="all" onclick="filterGuideCategory('all', this)">
+            Semua Modul Sistem (${window.featuresData.length})
+          </button>
           <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="servicedesk" onclick="filterGuideCategory('servicedesk', this)">Service Desk</button>
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="analytics" onclick="filterGuideCategory('analytics', this)">IT Ops & RMM</button>
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="itil" onclick="filterGuideCategory('itil', this)">Standar ITIL</button>
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="security" onclick="filterGuideCategory('security', this)">Keamanan & RBAC</button>
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="integrations" onclick="filterGuideCategory('integrations', this)">Integrasi</button>
+          ${userRole !== 'user' ? `
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="analytics" onclick="filterGuideCategory('analytics', this)">IT Ops & RMM</button>
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="itil" onclick="filterGuideCategory('itil', this)">Standar ITIL</button>
+          ` : ''}
+          ${['admin','manager'].includes(userRole) ? `
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="security" onclick="filterGuideCategory('security', this)">Keamanan & RBAC</button>
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="integrations" onclick="filterGuideCategory('integrations', this)">Integrasi</button>
+          ` : ''}
         </div>
       </div>
     </div>
@@ -480,7 +488,11 @@ window.loadSystemGuide = function() {
     </div>
   `;
 
-  renderGuideCards(window.featuresData);
+  const initialItems = userRole === 'admin'
+    ? window.featuresData
+    : window.featuresData.filter(f => f.roles.includes(userRole));
+
+  renderGuideCards(initialItems);
 };
 
 window.renderGuideCards = function(items) {
