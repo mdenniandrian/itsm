@@ -111,7 +111,7 @@ ITSM/
 
 ### Kebutuhan Perangkat Lunak
 * **Sistem Operasi:** Ubuntu 22.04 / 24.04 LTS, Debian 11 / 12, AlmaLinux 9, Rocky Linux 9, atau macOS
-* **PHP:** Versi `>= 8.2` (disarankan PHP 8.2 atau 8.3)
+* **PHP:** Versi `>= 8.3` (Laravel 13 framework memerlukan PHP 8.3 atau 8.4)
 * **Ekstensi PHP Wajib:** `bcmath`, `curl`, `dom`, `fileinfo`, `filter`, `gd`, `intl`, `json`, `ldap`, `mbstring`, `openssl`, `pcre`, `pdo`, `pdo_mysql` (atau `pdo_pgsql` / `pdo_sqlite`), `xml`, `zip`
 * **Composer:** Versi `>= 2.2`
 * **Web Server:** Nginx (Sangat direkomendasikan) atau Apache (dengan `mod_rewrite`)
@@ -132,23 +132,26 @@ Buka terminal SSH VPS Anda dan jalankan perintah instalasi dependensi:
 # 1. Update paket sistem
 sudo apt update && sudo apt upgrade -y
 
-# 2. Pasang repository PPA PHP 8.2 (Ondřej Surý)
+# 2. Pasang repository PPA PHP (Ondřej Surý)
 sudo apt install -y software-properties-common lsb-release ca-certificates apt-transport-https
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 
-# 3. Install PHP 8.2, semua ekstensi wajib, Git, Curl & Unzip
+# 3. Install PHP 8.3, semua ekstensi wajib, Git, Curl & Unzip
 sudo apt install -y \
-  php8.2-cli php8.2-fpm php8.2-mysql php8.2-pgsql php8.2-sqlite3 \
-  php8.2-mbstring php8.2-xml php8.2-curl php8.2-zip php8.2-bcmath \
-  php8.2-gd php8.2-intl php8.2-ldap php8.2-redis unzip git curl
+  php8.3-cli php8.3-fpm php8.3-mysql php8.3-pgsql php8.3-sqlite3 \
+  php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-bcmath \
+  php8.3-gd php8.3-intl php8.3-ldap php8.3-redis unzip git curl
 
-# 4. Install Composer secara Global
+# 4. Set PHP 8.3 sebagai versi default CLI
+sudo update-alternatives --set php /usr/bin/php8.3
+
+# 5. Install Composer secara Global
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 sudo chmod +x /usr/local/bin/composer
 
-# 5. Install Nginx, MySQL Server & Certbot SSL
+# 6. Install Nginx, MySQL Server & Certbot SSL
 sudo apt install -y nginx mysql-server certbot python3-certbot-nginx
 ```
 
@@ -157,9 +160,9 @@ sudo apt install -y nginx mysql-server certbot python3-certbot-nginx
 # 1. Install EPEL & Remi Repository
 sudo dnf install -y epel-release https://rpms.remirepo.net/enterprise/remi-release-9.rpm
 sudo dnf module reset php -y
-sudo dnf module enable php:remi-8.2 -y
+sudo dnf module enable php:remi-8.3 -y
 
-# 2. Install PHP 8.2 & extensions
+# 2. Install PHP 8.3 & extensions
 sudo dnf install -y \
   php-cli php-fpm php-mysqlnd php-pgsql php-pdo php-mbstring \
   php-xml php-curl php-zip php-bcmath php-gd php-intl php-ldap \

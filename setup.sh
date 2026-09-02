@@ -34,14 +34,23 @@ echo -e "${NC}"
 # 1. Check PHP CLI
 echo -e "${BLUE}[1/8] Checking PHP environment...${NC}"
 if ! command -v php &> /dev/null; then
-  echo -e "${RED}❌ PHP is not installed. Please install PHP 8.2 or higher with required extensions (pdo_mysql, pdo_sqlite, mbstring, openssl, xml, curl, zip, gd).${NC}"
+  echo -e "${RED}❌ PHP is not installed. Please install PHP 8.3 or higher with required extensions (pdo_mysql, pdo_sqlite, mbstring, openssl, xml, curl, zip, gd, intl, ldap).${NC}"
   exit 1
 fi
 PHP_VER=$(php -r 'echo PHP_VERSION;')
-echo -e "${GREEN}✓ PHP $PHP_VER detected.${NC}"
+if [ "$(php -r 'echo (version_compare(PHP_VERSION, "8.3.0", ">=") ? "1" : "0");')" = "0" ]; then
+  echo -e "${RED}❌ PHP $PHP_VER detected, but Laravel 13 framework requires PHP 8.3 or higher.${NC}"
+  echo -e "${YELLOW}👉 Run the following command on Ubuntu/Debian to install PHP 8.3:${NC}"
+  echo -e "   sudo apt install -y php8.3-cli php8.3-fpm php8.3-mysql php8.3-pgsql php8.3-sqlite3 php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-bcmath php8.3-gd php8.3-intl php8.3-ldap php8.3-redis"
+  echo -e "   sudo update-alternatives --set php /usr/bin/php8.3"
+  exit 1
+fi
+echo -e "${GREEN}✓ PHP $PHP_VER detected (Satisfies PHP >= 8.3 requirement).${NC}"
 
 # 2. Check Composer
 echo -e "${BLUE}[2/8] Checking Composer dependency manager...${NC}"
+export COMPOSER_ALLOW_SUPERUSER=1
+
 if ! command -v composer &> /dev/null; then
   echo -e "${YELLOW}⚠️ Composer is not installed globally. Checking local composer.phar...${NC}"
   if [ ! -f "$APP_DIR/composer.phar" ]; then
@@ -77,6 +86,7 @@ fi
 # 4. Install Composer Dependencies
 echo -e "${BLUE}[4/8] Installing PHP application packages...${NC}"
 rm -f bootstrap/cache/*.php 2>/dev/null || true
+export COMPOSER_ALLOW_SUPERUSER=1
 
 if [ ! -d "vendor" ]; then
   $COMPOSER_CMD install --optimize-autoloader --no-interaction --prefer-dist
