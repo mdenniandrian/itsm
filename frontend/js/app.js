@@ -418,6 +418,12 @@ function renderAppShell() {
           <span class="nav-icon">${renderIcon('profile')}</span>
           <span>My Profile</span>
         </button>
+
+        <div class="nav-section-label">Help & Docs</div>
+        <button class="nav-item" data-page="guide" id="nav-guide">
+          <span class="nav-icon">${renderIcon('book')}</span>
+          <span>System Features Guide</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer" style="padding:0.75rem 0.85rem">
@@ -584,6 +590,7 @@ function updateActiveNav(page) {
     branding: 'Brand & UI Theme Studio',
     addons: 'Add-ons & Integrations',
     profile: 'My Profile',
+    guide: 'System Features & Capabilities Guide',
   };
 
   const title = document.getElementById('topbar-title');
@@ -622,6 +629,7 @@ function loadPage(page, params = {}) {
     addons: () => loadAddons(),
     audit: () => typeof window.loadAuditLogs === 'function' && window.loadAuditLogs(),
     profile: () => loadProfile(),
+    guide: () => typeof window.loadSystemGuide === 'function' ? window.loadSystemGuide() : null,
   };
 
   if (page.startsWith('ticket-')) {
