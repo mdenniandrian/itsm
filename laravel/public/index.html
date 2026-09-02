@@ -150,23 +150,28 @@
 
           if (b.meta_title) document.title = b.meta_title;
           const fav = b.favicon_url || b.logo_url;
+          const primaryColor = b.theme_primary || b.primary_color || '#6366f1';
+
+          let link = document.querySelector("link[rel*='icon']");
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+          }
           if (fav) {
-            let link = document.querySelector("link[rel*='icon']");
-            if (!link) {
-              link = document.createElement('link');
-              link.rel = 'icon';
-              document.head.appendChild(link);
-            }
             link.href = fav;
+          } else {
+            link.type = 'image/svg+xml';
+            link.href = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${encodeURIComponent(primaryColor)}'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>`;
           }
 
-          if (b.primary_color) {
+          if (primaryColor) {
             const style = document.createElement('style');
             style.innerHTML = `
               :root {
-                --accent-primary: ${b.primary_color} !important;
-                --accent-secondary: ${b.secondary_color || '#8b5cf6'} !important;
-                --gradient-brand: linear-gradient(135deg, ${b.primary_color} 0%, ${b.secondary_color || '#8b5cf6'} 100%) !important;
+                --accent-primary: ${primaryColor} !important;
+                --accent-secondary: ${b.theme_secondary || b.secondary_color || '#8b5cf6'} !important;
+                --gradient-brand: linear-gradient(135deg, ${primaryColor} 0%, ${b.theme_secondary || b.secondary_color || '#8b5cf6'} 100%) !important;
               }
             `;
             document.head.appendChild(style);

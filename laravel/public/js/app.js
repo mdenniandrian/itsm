@@ -44,13 +44,18 @@ window.hexToRgba = function(hex, alpha = 1) {
 
 window.updateFavicon = function(iconUrl) {
   if (!iconUrl) return;
-  let link = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel='shortcut icon']");
-  if (!link) {
-    link = document.createElement('link');
-    link.rel = 'icon';
-    document.head.appendChild(link);
+  // Remove existing favicon links to force instant browser tab repaint across Chrome, Firefox, Safari
+  const existingLinks = document.querySelectorAll("link[rel~='icon'], link[rel='shortcut icon']");
+  existingLinks.forEach(el => el.remove());
+
+  const link = document.createElement('link');
+  link.id = 'dynamic-favicon';
+  link.rel = 'icon';
+  if (iconUrl.startsWith('data:image/svg+xml')) {
+    link.type = 'image/svg+xml';
   }
   link.href = iconUrl;
+  document.head.appendChild(link);
 };
 
 window.applyBrandingTheme = function(branding) {
@@ -64,6 +69,11 @@ window.applyBrandingTheme = function(branding) {
   const faviconUrl = branding.favicon_url || branding.logo_url;
   if (faviconUrl) {
     window.updateFavicon(faviconUrl);
+  } else {
+    // Dynamically color the default SVG Shield Favicon using active Theme Primary Color
+    const primaryColor = branding.theme_primary || '#6366f1';
+    const dynamicSvgFavicon = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${encodeURIComponent(primaryColor)}'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>`;
+    window.updateFavicon(dynamicSvgFavicon);
   }
 
   // Update Sidebar Brand

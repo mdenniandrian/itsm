@@ -601,8 +601,14 @@ window.liveUpdatePreview = function() {
   }
 
   // Update actual browser tab live!
-  if (effectiveFavicon && typeof window.updateFavicon === 'function') {
-    window.updateFavicon(effectiveFavicon);
+  if (typeof window.updateFavicon === 'function') {
+    if (effectiveFavicon) {
+      window.updateFavicon(effectiveFavicon);
+    } else {
+      const primaryColor = document.getElementById('brand-color-primary')?.value || '#6366f1';
+      const dynamicSvgFavicon = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${encodeURIComponent(primaryColor)}'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>`;
+      window.updateFavicon(dynamicSvgFavicon);
+    }
   }
   if (metaTitle) {
     document.title = metaTitle;
@@ -644,6 +650,13 @@ function applyLiveThemeVariables(primary, secondary, teal) {
   `;
   if (!document.getElementById('custom-branding-style')) {
     document.head.appendChild(styleEl);
+  }
+
+  // Update favicon in browser tab bar to match new theme primary accent color
+  const customFavicon = document.getElementById('brand-favicon-url')?.value.trim() || document.getElementById('brand-logo-url')?.value.trim();
+  if (!customFavicon && typeof window.updateFavicon === 'function') {
+    const dynamicSvgFavicon = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${encodeURIComponent(primary)}'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>`;
+    window.updateFavicon(dynamicSvgFavicon);
   }
 }
 
