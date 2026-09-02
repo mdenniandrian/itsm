@@ -90,6 +90,16 @@ class NotificationTemplate extends Model
                 'in_app_template' => 'WARNING: Ticket #{ticket_number} SLA has breached!',
                 'is_active' => true,
             ],
+            [
+                'event_key' => 'user_welcome_verification',
+                'name' => 'Account Registration & Verification (To New User)',
+                'description' => 'Welcome email with account credentials and portal link dispatched when an account is registered.',
+                'email_subject' => '🎉 Welcome to {app_name} - Your Account Credentials & Login Details',
+                'email_body' => "<p>Hello <strong>{user_name}</strong>,</p>\n<p>Your account has been successfully created and verified on the <strong>{app_name}</strong> Service Desk portal.</p>\n<p><strong>Your Account Login Credentials:</strong></p>\n<ul>\n  <li><strong>Login Email:</strong> {user_email}</li>\n  <li><strong>Temporary Password:</strong> <code>{temporary_password}</code></li>\n  <li><strong>Assigned Role:</strong> {user_role}</li>\n  <li><strong>Department:</strong> {department}</li>\n</ul>\n<p>Please click the link below to access the portal and update your password upon your first login:</p>\n<p><a href=\"{portal_url}\" style=\"background:#6366f1;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;font-weight:bold;display:inline-block;\">Login to ITSM Portal</a></p>",
+                'telegram_template' => "👤 <b>[NEW USER REGISTERED]</b>\n━━━━━━━━━━━━━━━━━━━━\n👤 <b>Name:</b> {user_name}\n📧 <b>Email:</b> {user_email}\n🏷️ <b>Role:</b> {user_role}\n🏢 <b>Department:</b> {department}\n━━━━━━━━━━━━━━━━━━━━\n🔗 <a href=\"{portal_url}\">View User Details</a>",
+                'in_app_template' => 'Welcome to ITSM Enterprise, {user_name}!',
+                'is_active' => true,
+            ],
         ];
     }
 

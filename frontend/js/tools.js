@@ -849,9 +849,7 @@ window.executePassGen = async function() {
 window.copyPassword = function() {
   const txt = document.getElementById('pass-result-text')?.textContent.trim();
   if (!txt) return;
-  navigator.clipboard.writeText(txt).then(() => {
-    toast.success('Password copied to clipboard!');
-  });
+  window.copyToClipboard(txt, 'Password copied to clipboard!');
 };
 
 window.executeBase64Jwt = async function(action = 'inspect') {
@@ -993,9 +991,7 @@ window.copyLastOutput = function() {
     toast.info('No diagnostic log available to copy.');
     return;
   }
-  navigator.clipboard.writeText(window.toolsState.lastOutput).then(() => {
-    toast.success('Diagnostic log copied to clipboard!');
-  });
+  window.copyToClipboard(window.toolsState.lastOutput, 'Diagnostic log copied to clipboard!');
 };
 
 // ============================================

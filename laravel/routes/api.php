@@ -54,11 +54,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
+        Route::get('/check-email', [UserController::class, 'checkEmail']);
         Route::get('/agents/list', [UserController::class, 'agents']);
         Route::get('/{id}', [UserController::class, 'show']);
         Route::put('/{id}', [UserController::class, 'update']);
         Route::put('/{id}/toggle-it-support', [UserController::class, 'toggleItSupport']);
         Route::put('/{id}/toggle-active', [UserController::class, 'toggleActive']);
+        Route::get('/{id}/sessions', [UserController::class, 'sessions']);
+        Route::post('/{id}/clear-sessions', [UserController::class, 'clearSessions']);
+        Route::delete('/{id}/sessions/{sessionId}', [UserController::class, 'destroySession']);
+        Route::post('/{id}/resend-verification', [UserController::class, 'resendVerification']);
         Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 

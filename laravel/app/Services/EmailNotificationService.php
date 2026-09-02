@@ -38,7 +38,11 @@ class EmailNotificationService
             $config = $addon->config ?: [];
         }
 
-        $host = $config['host'] ?? '127.0.0.1';
+        $host = trim($config['host'] ?? '127.0.0.1');
+        // Strip accidental protocol prefixes (e.g. smtp://, ssl://, tls://)
+        $host = preg_replace('#^(smtp|ssl|tls|https?)://#i', '', $host);
+        $host = explode(':', $host)[0]; // strip port if pasted as host:port
+
         // Auto resolve known host if DNS resolution fails
         if ($host === 'mail.bangden.my.id' && gethostbyname($host) === $host) {
             $host = '157.20.254.135';
@@ -63,7 +67,21 @@ class EmailNotificationService
             $isSsl = $encryption === 'ssl' || $port === 465;
 
             $transport = new EsmtpTransport($host, $port, $isSsl);
-            $transport->getStream()->setTimeout(2); // Fast 2-second timeout to prevent UI hanging
+            $stream = $transport->getStream();
+            
+            // Set 12-second timeout (sufficient for TLS handshake & cloud VPS network)
+            $stream->setTimeout(12);
+
+            // Allow self-signed or internal CA SSL certificates (for custom Zimbra/Postfix mail servers)
+            if (method_exists($stream, 'setStreamOptions')) {
+                $stream->setStreamOptions([
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true,
+                    ],
+                ]);
+            }
 
             if ($isTls) {
                 $transport->setAutoTls(true);
@@ -89,10 +107,25 @@ class EmailNotificationService
                 'message' => "Email sent successfully to {$toEmail} via SMTP {$host}:{$port}",
             ];
         } catch (\Exception $e) {
-            Log::error("SMTP Mail Send Error to {$toEmail}: " . $e->getMessage());
+            $err = $e->getMessage();
+            Log::error("SMTP Mail Send Error to {$toEmail}: " . $err);
+
+            $detailed = $err;
+            if (stripos($err, 'timed out') !== false || stripos($err, 'timeout') !== false) {
+                if ($port === 25) {
+                    $detailed = "Connection timed out on port 25. Port 25 is blocked by default on most VPS providers (DigitalOcean, AWS, Linode, etc.). Please switch to port 587 (TLS) or port 465 (SSL).";
+                } else {
+                    $detailed = "Connection to SMTP server '{$host}:{$port}' timed out after 12s. Please check if your VPS firewall allows outbound traffic to {$host}:{$port}, or verify the host address and port.";
+                }
+            } elseif (stripos($err, '535') !== false || stripos($err, 'authentication failed') !== false || stripos($err, 'bad credentials') !== false) {
+                $detailed = "SMTP Authentication failed for user '{$username}'. Please verify your credentials. If using Gmail / Google Workspace, please generate and use an App Password (Sandi Aplikasi).";
+            } elseif (stripos($err, 'Connection refused') !== false) {
+                $detailed = "Connection refused on {$host}:{$port}. No mail server is listening on this port or it is blocked by an external firewall.";
+            }
+
             return [
                 'success' => false,
-                'message' => "Failed to send email: " . $e->getMessage(),
+                'message' => $detailed,
             ];
         }
     }
@@ -466,6 +499,69 @@ class EmailNotificationService
         ";
 
         return self::buildHtmlTemplate($headerTitle, $badgeText, $badgeColor, $content);
+    }
+
+    /**
+     * Send Account Welcome & Verification Email to newly registered user
+     */
+    public static function sendUserWelcomeVerificationEmail(User $user, ?string $rawPassword = null): array
+    {
+        $appName = config('app.name', 'ITSM Enterprise');
+        $portalUrl = url('/');
+
+        $data = [
+            'app_name' => $appName,
+            'portal_url' => $portalUrl,
+            'user_name' => $user->name,
+            'user_email' => $user->email,
+            'user_role' => strtoupper($user->role),
+            'department' => $user->department ?: 'General Department',
+            'temporary_password' => $rawPassword ?: '(Your chosen secure password)',
+        ];
+
+        $subject = "🎉 Welcome to {$appName} - Account Registration & Login Details";
+        $content = "
+            <p>Hello <strong>" . htmlspecialchars($user->name) . "</strong>,</p>
+            <p>Your user account has been successfully created and verified on the <strong>{$appName}</strong> Service Desk portal.</p>
+            <div style='background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;padding:16px;margin:20px 0;'>
+                <div style='font-size:14px;font-weight:700;color:#0f172a;margin-bottom:12px;'>🔐 Your Account Login Details:</div>
+                <table style='width:100%;border-collapse:collapse;font-size:13px;'>
+                    <tr>
+                        <td style='padding:6px 0;color:#64748b;width:140px;'>Login Email:</td>
+                        <td style='padding:6px 0;font-weight:bold;color:#0f172a;'>" . htmlspecialchars($user->email) . "</td>
+                    </tr>
+                    <tr>
+                        <td style='padding:6px 0;color:#64748b;'>Password:</td>
+                        <td style='padding:6px 0;font-family:monospace;font-weight:600;color:#4338ca;background:rgba(99,102,241,0.08);padding-left:6px;border-radius:4px;'>" . htmlspecialchars($data['temporary_password']) . "</td>
+                    </tr>
+                    <tr>
+                        <td style='padding:6px 0;color:#64748b;'>Assigned Role:</td>
+                        <td style='padding:6px 0;'><span style='background:#6366f1;color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;'>" . strtoupper($user->role) . "</span></td>
+                    </tr>
+                    <tr>
+                        <td style='padding:6px 0;color:#64748b;'>Department:</td>
+                        <td style='padding:6px 0;color:#334155;'>" . htmlspecialchars($data['department']) . "</td>
+                    </tr>
+                </table>
+            </div>
+            <p style='margin-top:20px;text-align:center;'>
+                <a href='{$portalUrl}' style='background:linear-gradient(135deg,#6366f1 0%,#4338ca 100%);color:white;padding:12px 28px;text-decoration:none;border-radius:6px;font-weight:bold;display:inline-block;box-shadow:0 4px 12px rgba(99,102,241,0.3);'>Login to ITSM Portal</a>
+            </p>
+            <p style='font-size:12px;color:#64748b;margin-top:24px;'>
+                🔒 <strong>Security Notice:</strong> Please log in and change your password after your first login via <em>Account Settings</em>.
+            </p>
+        ";
+
+        $tmpl = \App\Models\NotificationTemplate::where('event_key', 'user_welcome_verification')->where('is_active', true)->first();
+        if ($tmpl) {
+            $subject = \App\Models\NotificationTemplate::render($tmpl->email_subject, $data);
+            $renderedBody = \App\Models\NotificationTemplate::render($tmpl->email_body, $data);
+            $htmlBody = self::buildHtmlTemplate("Welcome to {$appName}", "ACCOUNT VERIFIED", "#10b981", $renderedBody);
+        } else {
+            $htmlBody = self::buildHtmlTemplate("Welcome to {$appName}", "ACCOUNT VERIFIED", "#10b981", $content);
+        }
+
+        return self::sendEmail($user->email, $subject, $htmlBody);
     }
 
     /**

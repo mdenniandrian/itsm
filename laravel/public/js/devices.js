@@ -470,8 +470,8 @@ window.showEnrollDeviceModal = function(initialTab = 'install') {
             <span>🍏 macOS & 🐧 Linux (Terminal):</span>
           </label>
           <div style="position:relative">
-            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/install-agent.sh | bash -s "${host}"</pre>
-            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('curl -sSL ${host}/agent/install-agent.sh | bash -s &quot;${host}&quot;')">Copy</button>
+            <pre id="cmd-install-unix" style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/install-agent.sh | bash -s "${host}"</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyElementText('cmd-install-unix')">Copy</button>
           </div>
           <div class="text-xs text-muted mt-1">Registers macOS LaunchAgent / Linux Systemd user service named <code>itsm-agent</code>.</div>
         </div>
@@ -482,8 +482,8 @@ window.showEnrollDeviceModal = function(initialTab = 'install') {
             <span>🪟 Windows (PowerShell):</span>
           </label>
           <div style="position:relative">
-            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/install-agent.ps1" | iex }</pre>
-            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('&amp; { $h=\x27${host}\x27; irm \x22$h/agent/install-agent.ps1\x22 | iex }')">Copy</button>
+            <pre id="cmd-install-win" style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/install-agent.ps1" | iex }</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyElementText('cmd-install-win')">Copy</button>
           </div>
           <div class="text-xs text-muted mt-1">Registers Windows Scheduled Task <code>ITSMEndpointAgent</code> running <code>itsm-agent.exe</code> on logon.</div>
         </div>
@@ -504,8 +504,8 @@ window.showEnrollDeviceModal = function(initialTab = 'install') {
             <span>🍏 macOS & 🐧 Linux (Terminal):</span>
           </label>
           <div style="position:relative">
-            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#fda4af;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/uninstall-agent.sh | bash</pre>
-            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('curl -sSL ${host}/agent/uninstall-agent.sh | bash')">Copy</button>
+            <pre id="cmd-uninstall-unix" style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#fda4af;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/uninstall-agent.sh | bash</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyElementText('cmd-uninstall-unix')">Copy</button>
           </div>
           <div class="text-xs text-muted mt-1">Unloads LaunchAgent plist, terminates running processes, and cleans up tokens.</div>
         </div>
@@ -516,8 +516,8 @@ window.showEnrollDeviceModal = function(initialTab = 'install') {
             <span>🪟 Windows (PowerShell):</span>
           </label>
           <div style="position:relative">
-            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#fda4af;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/uninstall-agent.ps1" | iex }</pre>
-            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('&amp; { $h=\x27${host}\x27; irm \x22$h/agent/uninstall-agent.ps1\x22 | iex }')">Copy</button>
+            <pre id="cmd-uninstall-win" style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#fda4af;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/uninstall-agent.ps1" | iex }</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyElementText('cmd-uninstall-win')">Copy</button>
           </div>
           <div class="text-xs text-muted mt-1">Unregisters scheduled task, kills process, and removes local folder.</div>
         </div>
@@ -766,8 +766,8 @@ window.deleteDevice = function(id) {
           To permanently stop and remove it from that machine:
         </p>
         <div style="position:relative">
-          <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.5rem;border-radius:6px;color:#fda4af;font-size:0.75rem;overflow-x:auto">curl -sSL ${host}/agent/uninstall-agent.sh | bash</pre>
-          <button class="btn btn-secondary btn-xs" style="position:absolute;top:4px;right:4px" onclick="copyCommand('curl -sSL ${host}/agent/uninstall-agent.sh | bash')">Copy</button>
+          <pre id="cmd-del-uninstall" style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.5rem;border-radius:6px;color:#fda4af;font-size:0.75rem;overflow-x:auto">curl -sSL ${host}/agent/uninstall-agent.sh | bash</pre>
+          <button class="btn btn-secondary btn-xs" style="position:absolute;top:4px;right:4px" onclick="copyElementText('cmd-del-uninstall')">Copy</button>
         </div>
       </div>
     </div>

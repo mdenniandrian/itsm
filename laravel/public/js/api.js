@@ -83,10 +83,15 @@ window.usersApi = {
   list: (params) => api.get('/users', params),
   agents: () => api.get('/users/agents/list'),
   get: (id) => api.get(`/users/${id}`),
+  checkEmail: (email, excludeUserId) => api.get('/users/check-email', { email, exclude_user_id: excludeUserId }),
   create: (data) => api.post('/users', data),
   update: (id, data) => api.put(`/users/${id}`, data),
   toggleItSupport: (id, data) => api.put(`/users/${id}/toggle-it-support`, data),
   toggleActive: (id, data) => api.put(`/users/${id}/toggle-active`, data),
+  getSessions: (id) => api.get(`/users/${id}/sessions`),
+  clearSessions: (id) => api.post(`/users/${id}/clear-sessions`),
+  deleteSession: (id, sessionId) => api.delete(`/users/${id}/sessions/${sessionId}`),
+  resendVerification: (id) => api.post(`/users/${id}/resend-verification`),
   delete: (id) => api.delete(`/users/${id}`),
 };
 

@@ -991,3 +991,61 @@ window.renderMarkdown = function(text) {
     .replace(/^(?!<[a-z])/gm, '')
     .replace(/<p><\/p>/g, '');
 };
+
+// ============================================
+// UNIVERSAL CLIPBOARD COPY HELPER (HTTP & HTTPS)
+// ============================================
+window.copyToClipboard = function(text, successMessage = 'Copied to clipboard!') {
+  if (!text) return;
+
+  // 1. Try modern async Clipboard API if available in secure context
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      if (typeof toast !== 'undefined') toast.success(successMessage);
+    }).catch(() => {
+      fallbackCopyText(text, successMessage);
+    });
+    return;
+  }
+
+  // 2. Universal fallback using hidden textarea (Works 100% on HTTP and all browsers)
+  fallbackCopyText(text, successMessage);
+};
+
+function fallbackCopyText(text, successMessage) {
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.top = '-9999px';
+    textArea.style.left = '-9999px';
+    textArea.style.opacity = '0';
+    textArea.setAttribute('readonly', '');
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    textArea.setSelectionRange(0, 99999);
+
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+
+    if (successful) {
+      if (typeof toast !== 'undefined') toast.success(successMessage);
+    } else {
+      window.prompt('Copy to clipboard (Ctrl+C / Cmd+C, Enter):', text);
+    }
+  } catch (err) {
+    window.prompt('Copy to clipboard (Ctrl+C / Cmd+C, Enter):', text);
+  }
+}
+
+window.copyElementText = function(elementId, successMessage = 'Command copied to clipboard!') {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const text = el.innerText || el.textContent;
+  window.copyToClipboard(text.trim(), successMessage);
+};
+
+window.copyCommand = function(text) {
+  window.copyToClipboard(text, 'Command copied to clipboard!');
+};

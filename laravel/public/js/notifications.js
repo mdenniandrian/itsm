@@ -528,6 +528,10 @@ function renderUsersTable(users) {
             </td>
             <td>
               <div class="flex items-center gap-1">
+                <button class="btn btn-sm btn-ghost" onclick="showUserSessionsModal(${u.id}, '${escHtml(u.name)}')" title="View Active Login Sessions & Security Manager" style="color:#818cf8;display:inline-flex;align-items:center;gap:4px">
+                  <span>🔑</span>
+                  <span class="text-xs" style="font-weight:600">Sessions</span>
+                </button>
                 <button class="btn btn-sm btn-ghost" onclick="showEditUserModal(${u.id})" title="Edit User, Role, & Status" style="color:var(--text-secondary)">
                   ${renderIcon('edit')}
                 </button>
@@ -554,6 +558,33 @@ function renderUsersTable(users) {
   `;
 }
 
+function validateEmailFormat(email) {
+  if (!email || !email.includes('@')) {
+    return { valid: false, message: 'Please enter a valid email address.' };
+  }
+  const parts = email.split('@');
+  if (parts.length !== 2) {
+    return { valid: false, message: 'Email address must contain a single @ separator.' };
+  }
+  const [local, domain] = parts;
+  if (local.length < 2 || /^(test|dummy|fake|asdf|qwerty|temp|sample|testing)$/i.test(local)) {
+    return { valid: false, message: 'Dummy username (e.g. test, dummy, fake) is not allowed. Please enter a real user email.' };
+  }
+  if (!domain.includes('.') || domain.split('.').pop().length < 2) {
+    return { valid: false, message: 'Email domain must have a valid top-level domain (e.g. .com, .id).' };
+  }
+  const blockedDomains = [
+    'example.com', 'example.org', 'example.net', 'test.com', 'test.net',
+    'dummy.com', 'fake.com', 'invalid.com', 'sample.com', 'temp.com',
+    'asdf.com', 'qwerty.com', 'mailinator.com', '10minutemail.com', 'tempmail.com',
+    'throwawaymail.com', 'yopmail.com', 'trashmail.com'
+  ];
+  if (blockedDomains.includes(domain.toLowerCase())) {
+    return { valid: false, message: `Domain '@${domain}' is a dummy/disposable domain. Please use a valid corporate or recognized email (e.g. name@company.com, name@gmail.com).` };
+  }
+  return { valid: true };
+}
+
 window.quickToggleItSupport = async function(id, setAsIt) {
   try {
     const res = await usersApi.toggleItSupport(id, { is_it_support: setAsIt });
@@ -563,6 +594,48 @@ window.quickToggleItSupport = async function(id, setAsIt) {
     toast.error('Failed to change IT Support status', e.message);
   }
 };
+
+window.handleRealtimeEmailValidation = debounce(async function(email) {
+  const inputEl = document.getElementById('nu-email');
+  const feedbackEl = document.getElementById('nu-email-feedback');
+  if (!inputEl || !feedbackEl) return;
+
+  const trimmed = (email || '').trim();
+  if (!trimmed) {
+    inputEl.style.borderColor = '';
+    feedbackEl.innerHTML = `<span class="text-muted">Must be a valid real domain. Disposable/dummy emails are blocked.</span>`;
+    return;
+  }
+
+  // 1. Fast preliminary client-side check
+  const localCheck = validateEmailFormat(trimmed);
+  if (!localCheck.valid) {
+    inputEl.style.borderColor = '#ef4444';
+    feedbackEl.innerHTML = `<span style="color:#ef4444;font-weight:500">⚠️ ${escHtml(localCheck.message)}</span>`;
+    return;
+  }
+
+  // 2. Query backend live validation & global DNS MX mail checker
+  feedbackEl.innerHTML = `<span style="color:#818cf8;display:inline-flex;align-items:center;gap:4px"><span>⏳</span><span>Checking global DNS Mail Server (MX) records...</span></span>`;
+
+  try {
+    const res = await usersApi.checkEmail(trimmed);
+    if (!res.valid) {
+      inputEl.style.borderColor = '#ef4444';
+      feedbackEl.innerHTML = `<span style="color:#ef4444;font-weight:600">❌ ${escHtml(res.message)}</span>`;
+    } else if (!res.available) {
+      inputEl.style.borderColor = '#f59e0b';
+      feedbackEl.innerHTML = `<span style="color:#f59e0b;font-weight:600">⚠️ ${escHtml(res.message)}</span>`;
+    } else {
+      inputEl.style.borderColor = '#10b981';
+      const mxHost = res.mx_host ? ` <code style="background:rgba(16,185,129,0.15);color:#34d399;padding:1px 5px;border-radius:4px;font-size:0.7rem">MX: ${escHtml(res.mx_host)}</code>` : '';
+      feedbackEl.innerHTML = `<span style="color:#10b981;font-weight:600">✓ Verified Active Global Mailbox${mxHost}</span>`;
+    }
+  } catch(e) {
+    inputEl.style.borderColor = '#10b981';
+    feedbackEl.innerHTML = `<span style="color:#10b981;font-weight:600">✓ Valid email format</span>`;
+  }
+}, 250);
 
 window.showNewUserModal = function() {
   modal.show(`
@@ -575,11 +648,14 @@ window.showNewUserModal = function() {
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label font-medium text-xs">Full Name *</label>
-            <input type="text" class="form-control" id="nu-name" placeholder="User name">
+            <input type="text" class="form-control" id="nu-name" placeholder="Full name">
           </div>
           <div class="form-group">
-            <label class="form-label font-medium text-xs">Email *</label>
-            <input type="email" class="form-control" id="nu-email" placeholder="email@company.com">
+            <label class="form-label font-medium text-xs">Corporate / Real Email *</label>
+            <input type="email" class="form-control" id="nu-email" placeholder="user@company.com" oninput="handleRealtimeEmailValidation(this.value)" onblur="handleRealtimeEmailValidation(this.value)">
+            <div class="text-xs mt-1" id="nu-email-feedback">
+              <span class="text-muted">Must be a valid real domain. Disposable/dummy emails are blocked.</span>
+            </div>
           </div>
         </div>
         <div class="grid-2">
@@ -617,8 +693,24 @@ window.showNewUserModal = function() {
           </div>
           <div class="form-group">
             <label class="form-label font-medium text-xs">Phone Number</label>
-            <input type="text" class="form-control" id="nu-phone" placeholder="+1...">
+            <input type="text" class="form-control" id="nu-phone" placeholder="+62...">
           </div>
+        </div>
+
+        <!-- Automatic Welcome & Verification Email Dispatch -->
+        <div class="p-3 card" style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:8px">
+          <label class="flex items-start gap-2.5 cursor-pointer mb-0">
+            <input type="checkbox" id="nu-send-email" checked style="margin-top:2px">
+            <div>
+              <span class="font-bold text-xs text-primary flex items-center gap-1.5">
+                <span>📧</span>
+                <span>Send Welcome & Verification Email with Login Details</span>
+              </span>
+              <div class="text-xs text-muted mt-0.5" style="line-height:1.4">
+                Automatically delivers account confirmation, portal URL, and login credentials to the user's verified inbox via SMTP Gateway.
+              </div>
+            </div>
+          </label>
         </div>
       </div>
     </div>
@@ -631,25 +723,54 @@ window.showNewUserModal = function() {
 
 window.createUser = async function() {
   const isIt = !!document.getElementById('nu-is-it')?.checked;
+  const sendEmail = !!document.getElementById('nu-send-email')?.checked;
+  const emailVal = document.getElementById('nu-email').value.trim();
+
+  const emailCheck = validateEmailFormat(emailVal);
+  if (!emailCheck.valid) {
+    toast.warning(emailCheck.message);
+    document.getElementById('nu-email').focus();
+    return;
+  }
+
   const data = {
     name: document.getElementById('nu-name').value.trim(),
-    email: document.getElementById('nu-email').value.trim(),
+    email: emailVal,
     password: document.getElementById('nu-password').value,
     role: document.getElementById('nu-role').value,
     is_it_support: isIt,
     it_specialty: document.getElementById('nu-specialty')?.value.trim() || (isIt ? 'General IT Support' : null),
     department: document.getElementById('nu-dept').value.trim(),
     phone: document.getElementById('nu-phone').value.trim(),
+    send_email: sendEmail,
   };
   if (!data.name || !data.email || !data.password) { toast.warning('Name, email, and password are required'); return; }
 
   try {
-    await usersApi.create(data);
+    const res = await usersApi.create(data);
     modal.close();
-    toast.success('User created successfully');
+    if (res.email_sent) {
+      toast.success(`User created & welcome/verification email sent to ${data.email}`);
+    } else {
+      toast.success('User created successfully');
+    }
     fetchAndRenderUsers();
   } catch(e) {
     toast.error('Failed to create user', e.message);
+  }
+};
+
+window.resendUserVerification = async function(id, userName) {
+  try {
+    toast.info(`Dispatching welcome/verification email to ${userName}...`);
+    const res = await usersApi.resendVerification(id);
+    if (res.success) {
+      toast.success(res.message || 'Verification email successfully sent!');
+    } else {
+      toast.warning(res.message || 'Email gateway message logged.');
+    }
+  } catch(e) {
+    toast.error('Failed to send verification email', e.message);
   }
 };
 
@@ -721,10 +842,13 @@ window.showEditUserModal = async function(id) {
         </div>
       </div>
       <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
-        <div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm text-primary" onclick="resendUserVerification(${u.id}, '${escHtml(u.name)}')" title="Resend Welcome Email with login details to user's registered inbox" style="border:1px solid rgba(99,102,241,0.3)">
+            📧 Resend Welcome Email
+          </button>
           ${(!isSelf && !isSuperadmin) ? `
             <button class="btn btn-ghost text-danger btn-sm" onclick="modal.close(); confirmDeleteUser(${u.id}, '${escHtml(u.name)}', '${escHtml(u.email)}')">
-              ${renderIcon('trash')} Delete This User
+              ${renderIcon('trash')} Delete
             </button>
           ` : ''}
         </div>
@@ -848,6 +972,152 @@ window.executeDeleteUser = async function(id) {
     fetchAndRenderUsers();
   } catch(e) {
     toast.error(e.message || 'Failed to delete user');
+  }
+};
+
+// ============================================
+// USER ACTIVE SESSION MANAGER
+// ============================================
+window.showUserSessionsModal = async function(id, userName) {
+  try {
+    modal.show(`<div class="flex-center p-8"><div class="spinner spinner-lg"></div></div>`, { size: 'modal-lg' });
+    const data = await usersApi.getSessions(id);
+    const u = data.user;
+    const tokens = data.tokens || [];
+    const sessions = data.sessions || [];
+    const total = data.total_active_sessions || 0;
+
+    modal.show(`
+      <div class="modal-header">
+        <div class="flex items-center gap-2.5">
+          <span style="font-size:1.3rem">🛡️</span>
+          <div>
+            <span class="modal-title font-bold text-sm">Session Security & Active Devices — ${escHtml(u.name)}</span>
+            <div class="text-xs text-muted font-mono">${escHtml(u.email)} • Role: ${u.role.toUpperCase()}</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="modal.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Summary Banner -->
+        <div class="p-3 mb-4 flex items-center justify-between flex-wrap gap-3" style="background:var(--bg-input);border:1px solid var(--border-primary);border-radius:8px">
+          <div class="flex items-center gap-3">
+            <div class="stat-value text-primary" style="font-size:1.5rem;font-weight:700">${total}</div>
+            <div>
+              <div class="font-bold text-xs">Active Login Sessions / Tokens</div>
+              <div class="text-xs text-muted">Web browsers, mobile apps & API tokens currently authenticated</div>
+            </div>
+          </div>
+          ${total > 0 ? `
+            <button class="btn btn-danger btn-sm" onclick="clearAllUserSessions(${u.id}, '${escHtml(u.name)}')">
+              ${renderIcon('trash')}
+              <span>Clear All Sessions (Force Logout)</span>
+            </button>
+          ` : `
+            <span class="badge badge-secondary text-xs">No active sessions</span>
+          `}
+        </div>
+
+        <!-- Sessions List -->
+        <div class="card">
+          <div class="card-header py-2 flex items-center justify-between">
+            <span class="card-title text-xs font-semibold">Active Login Tokens & Device Connections</span>
+            <button class="btn btn-ghost btn-xs text-primary" onclick="showUserSessionsModal(${u.id}, '${escHtml(u.name)}')">
+              ${renderIcon('refresh')} Refresh
+            </button>
+          </div>
+          <div class="table-responsive" style="max-height:300px;overflow-y:auto">
+            ${(tokens.length || sessions.length) ? `
+              <table class="table text-xs">
+                <thead>
+                  <tr>
+                    <th>Session / Device Client</th>
+                    <th>Authentication Type</th>
+                    <th>Created</th>
+                    <th>Last Active</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tokens.map(t => `
+                    <tr>
+                      <td>
+                        <div class="font-bold text-primary flex items-center gap-1.5">
+                          <span>💻</span>
+                          <span>${escHtml(t.name)}</span>
+                          ${t.is_current ? '<span class="badge badge-success text-xs" style="font-size:0.65rem">Your Current Session</span>' : ''}
+                        </div>
+                        <div class="text-xs text-muted font-mono">Token ID #${t.id}</div>
+                      </td>
+                      <td><span class="badge badge-info text-xs">Sanctum Token</span></td>
+                      <td>${formatDateShort(t.created_at)}</td>
+                      <td><span class="text-accent font-medium">${t.last_used_at ? formatDateShort(t.last_used_at) : 'Active Now'}</span></td>
+                      <td>
+                        <button class="btn btn-xs btn-ghost text-danger" onclick="revokeSingleUserSession(${u.id}, ${t.id}, '${escHtml(u.name)}')" title="Terminate this session">
+                          Revoke
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                  ${sessions.map(s => `
+                    <tr>
+                      <td>
+                        <div class="font-bold text-primary flex items-center gap-1.5">
+                          <span>🌐</span>
+                          <span class="truncate" style="max-width:200px">${escHtml(s.user_agent || 'Web Browser')}</span>
+                        </div>
+                        <div class="text-xs text-muted font-mono">IP: ${escHtml(s.ip_address || '-')}</div>
+                      </td>
+                      <td><span class="badge badge-secondary text-xs">Web Session</span></td>
+                      <td>-</td>
+                      <td><span class="text-accent font-medium">${formatDateShort(s.last_activity)}</span></td>
+                      <td>
+                        <button class="btn btn-xs btn-ghost text-danger" onclick="revokeSingleUserSession(${u.id}, '${s.id}', '${escHtml(u.name)}')" title="Terminate this session">
+                          Revoke
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : `
+              <div class="p-6 text-center text-muted text-xs">
+                <div>🔒 No active login sessions recorded for this user.</div>
+              </div>
+            `}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="modal.close()">Close</button>
+      </div>
+    `, { size: 'modal-lg' });
+  } catch(e) {
+    toast.error('Failed to load user sessions', e.message);
+  }
+};
+
+window.clearAllUserSessions = async function(id, userName) {
+  modal.confirm('Force Logout / Clear Sessions', `Are you sure you want to terminate <b>ALL</b> active login sessions for <b>${escHtml(userName)}</b>?<br><br>The user will be immediately logged out from all browsers and devices.`, async () => {
+    try {
+      const res = await usersApi.clearSessions(id);
+      toast.success(res.message || 'All user sessions cleared successfully');
+      showUserSessionsModal(id, userName);
+      fetchAndRenderUsers();
+    } catch(e) {
+      toast.error('Failed to clear sessions', e.message);
+    }
+  });
+};
+
+window.revokeSingleUserSession = async function(userId, sessionId, userName) {
+  try {
+    const res = await usersApi.deleteSession(userId, sessionId);
+    toast.success(res.message || 'Session revoked successfully');
+    showUserSessionsModal(userId, userName);
+    fetchAndRenderUsers();
+  } catch(e) {
+    toast.error('Failed to revoke session', e.message);
   }
 };
 
