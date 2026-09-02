@@ -1,0 +1,26 @@
+# ==============================================================================
+# ITSM ENTERPRISE - SYSTEMD BACKGROUND QUEUE WORKER
+# ==============================================================================
+# Location: /etc/systemd/system/itsm-queue.service
+# Enable & Start:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now itsm-queue.service
+#   sudo systemctl status itsm-queue.service
+# ==============================================================================
+
+[Unit]
+Description=ITSM Enterprise Queue Worker
+After=network.target mysql.service
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+WorkingDirectory=/var/www/itsm/laravel
+ExecStart=/usr/bin/php /var/www/itsm/laravel/artisan queue:work database --sleep=3 --tries=3 --max-time=3600
+StandardOutput=append:/var/www/itsm/laravel/storage/logs/queue-worker.log
+StandardError=append:/var/www/itsm/laravel/storage/logs/queue-worker.log
+
+[Install]
+WantedBy=multi-user.target

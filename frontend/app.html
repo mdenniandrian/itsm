@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITSM Portal - Enterprise Service Desk & Operations</title>
+  <meta name="description" content="IT Service Management Portal - Dashboard, Tickets, Knowledge Base, and Asset Operations Management">
+  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css?v=3.5">
+  <link rel="stylesheet" href="css/components.css?v=3.5">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Quill.js Rich Text Editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+</head>
+<body>
+  <!-- App Root -->
+  <div id="app-root">
+    <!-- Loading Screen -->
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:var(--bg-primary)">
+      <div style="width:48px;height:48px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;box-shadow:0 8px 24px rgba(99,102,241,0.3)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="spinner spinner-lg"></div>
+      <p style="color:var(--text-muted);font-size:0.875rem;font-weight:500">Loading ITSM Enterprise Portal...</p>
+    </div>
+  </div>
+
+  <!-- Scripts - Load in order -->
+  <script src="js/icons.js?v=3.4"></script>
+  <script src="js/api.js?v=3.4"></script>
+  <script src="js/app.js?v=3.4"></script>
+  <script src="js/dashboard.js?v=3.4"></script>
+  <script src="js/tickets.js?v=3.4"></script>
+  <script src="js/notifications.js?v=3.4"></script>
+  <script src="js/kpi.js?v=3.4"></script>
+  <script src="js/devices.js?v=3.4"></script>
+  <script src="js/branding.js?v=3.4"></script>
+  <script src="js/addons.js?v=3.4"></script>
+  <script src="js/changes.js?v=3.4"></script>
+  <script src="js/services.js?v=3.4"></script>
+  <script src="js/problems.js?v=3.4"></script>
+  <script src="js/tools.js?v=3.4"></script>
+  <script src="js/audit.js?v=3.4"></script>
+</body>
+</html>

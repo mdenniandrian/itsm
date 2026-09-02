@@ -1,0 +1,27 @@
+# ==============================================================================
+# ITSM ENTERPRISE - STANDALONE SYSTEMD WEB SERVICE (HOMESERVER / LAB)
+# ==============================================================================
+# Location: /etc/systemd/system/itsm-server.service
+# Useful for lightweight home servers / Raspberry Pi without full Nginx setup
+# Enable & Start:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now itsm-server.service
+#   sudo systemctl status itsm-server.service
+# ==============================================================================
+
+[Unit]
+Description=ITSM Enterprise Standalone Server
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=3
+WorkingDirectory=/var/www/itsm/laravel
+ExecStart=/usr/bin/php /var/www/itsm/laravel/artisan serve --host=0.0.0.0 --port=8000
+StandardOutput=append:/var/www/itsm/laravel/storage/logs/itsm-server.log
+StandardError=append:/var/www/itsm/laravel/storage/logs/itsm-server.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITSM Portal - Enterprise Service Desk & IT Operations</title>
+  <meta name="description" content="IT Service Management Portal - Sign in to manage tickets, incidents, assets, and IT operations telemetry.">
+  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css?v=3.4">
+  <link rel="stylesheet" href="css/components.css?v=3.4">
+  <script src="js/icons.js?v=3.4"></script>
+  <style>
+    body { overflow-x: hidden; min-height: 100vh; min-height: 100dvh; }
+    .login-page { min-height: 100vh; min-height: 100dvh; overflow-y: auto; padding: 2rem 1rem; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  <main class="login-page" id="login-page">
+    <!-- Animated Background -->
+    <div class="login-bg">
+      <div class="login-bg-orb"></div>
+      <div class="login-bg-orb"></div>
+      <div class="login-bg-orb"></div>
+      <div class="login-bg-grid"></div>
+    </div>
+
+    <div class="login-container">
+      <div class="login-card">
+        <!-- Logo -->
+        <div class="login-logo" id="login-logo-container">
+          <div class="login-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h1 class="login-title">ITSM Portal</h1>
+          <p class="login-subtitle">Enterprise IT Service Management System</p>
+          <div style="margin-top:4px"><span class="badge badge-secondary" id="login-app-version" style="font-size:0.65rem">v1.0.0</span></div>
+        </div>
+
+        <!-- Login Form -->
+        <form class="login-form" id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Work Email Address</label>
+            <div class="login-input-wrap">
+              <span class="login-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
+              <input
+                type="email"
+                id="login-email"
+                class="form-control login-input"
+                placeholder="user@company.com"
+                required
+                autocomplete="email"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="login-input-wrap">
+              <span class="login-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input
+                type="password"
+                id="login-password"
+                class="form-control login-input"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              >
+            </div>
+          </div>
+
+          <div id="login-error" class="form-error" style="display:none;text-align:center;padding:0.6rem;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:8px;color:#fb7185;font-size:0.8rem"></div>
+
+          <button type="submit" class="btn btn-primary btn-lg login-btn w-full" id="login-btn">
+            <span id="login-btn-text">Sign In to Portal</span>
+            <div id="login-spinner" class="spinner" style="display:none;"></div>
+          </button>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-muted text-xs mt-4" id="login-footer">
+        <span id="footer-app-name">ITSM Portal</span> &bull; 
+        <a href="https://instagram.com/mdenniandrian_" target="_blank" rel="noopener noreferrer" id="footer-copyright-link" style="color:var(--accent-primary);text-decoration:none;font-weight:600">Made by @mdenniandrian_</a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = '/api';
+
+    // Load Branding dynamically on login page
+    async function loadLoginBranding() {
+      try {
+        const res = await fetch(`${API_BASE}/branding`);
+        if (res.ok) {
+          const data = await res.json();
+          const b = data.branding || {};
+
+          if (b.meta_title) document.title = b.meta_title;
+          
+          const logoWrap = document.getElementById('login-logo-container');
+          const versionFormatted = 'v' + (b.app_version || '1.0.0').replace(/^v/, '');
+          
+          if (b.logo_url) {
+            if (b.logo_type === 'image_banner' || !b.app_name) {
+              logoWrap.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0.35rem;margin-bottom:0.75rem">
+                  <img src="${b.logo_url}" alt="Logo" style="max-height:50px;max-width:100%;object-fit:contain">
+                  ${b.app_subtitle ? `<p class="login-subtitle" style="margin:0">${b.app_subtitle}</p>` : ''}
+                  <div style="margin-top:2px"><span class="badge badge-secondary" style="font-size:0.65rem">${versionFormatted}</span></div>
+                </div>
+              `;
+            } else {
+              logoWrap.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0.35rem;margin-bottom:0.75rem">
+                  <img src="${b.logo_url}" alt="Logo" style="width:48px;height:48px;object-fit:contain;border-radius:10px">
+                  <h1 class="login-title">${b.app_name}</h1>
+                  <p class="login-subtitle">${b.app_subtitle || ''}</p>
+                  <div style="margin-top:2px"><span class="badge badge-secondary" style="font-size:0.65rem">${versionFormatted}</span></div>
+                </div>
+              `;
+            }
+          } else {
+            if (b.app_name) document.querySelector('.login-title').textContent = b.app_name;
+            if (b.app_subtitle) document.querySelector('.login-subtitle').textContent = b.app_subtitle;
+            const verEl = document.getElementById('login-app-version');
+            if (verEl) verEl.textContent = versionFormatted;
+          }
+
+          if (b.app_name) {
+            document.getElementById('footer-app-name').textContent = b.app_name;
+          }
+          if (b.copyright_text) document.getElementById('footer-copyright-link').textContent = b.copyright_text;
+          if (b.copyright_author_url) document.getElementById('footer-copyright-link').href = b.copyright_author_url;
+
+          if (b.meta_title) document.title = b.meta_title;
+          const fav = b.favicon_url || b.logo_url;
+          if (fav) {
+            let link = document.querySelector("link[rel*='icon']");
+            if (!link) {
+              link = document.createElement('link');
+              link.rel = 'icon';
+              document.head.appendChild(link);
+            }
+            link.href = fav;
+          }
+
+          if (b.primary_color) {
+            const style = document.createElement('style');
+            style.innerHTML = `
+              :root {
+                --accent-primary: ${b.primary_color} !important;
+                --accent-secondary: ${b.secondary_color || '#8b5cf6'} !important;
+                --gradient-brand: linear-gradient(135deg, ${b.primary_color} 0%, ${b.secondary_color || '#8b5cf6'} 100%) !important;
+              }
+            `;
+            document.head.appendChild(style);
+          }
+        }
+      } catch (e) {}
+    }
+    loadLoginBranding();
+
+    function fillDemo(email, password) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = password;
+      document.getElementById('login-email').focus();
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+      const btnText = document.getElementById('login-btn-text');
+      const spinner = document.getElementById('login-spinner');
+
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btnText.textContent = 'Authenticating...';
+      spinner.style.display = 'block';
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Sign in failed');
+
+        localStorage.setItem('itsm_token', data.token);
+        localStorage.setItem('itsm_user', JSON.stringify(data.user));
+
+        // Redirect to app
+        window.location.href = 'app.html';
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btnText.textContent = 'Sign In to Portal';
+        spinner.style.display = 'none';
+      }
+    });
+
+    // Check if already logged in
+    if (localStorage.getItem('itsm_token')) {
+      window.location.href = 'app.html';
+    }
+  </script>
+</body>
+</html>
