@@ -145,23 +145,30 @@ window.toggleTheme = function() {
 window.chartDefaults = function(type) {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   const isDonut = type === 'doughnut';
-  const textColor = isLight ? '#475569' : '#8892aa';
-  const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
-  const tooltipBg = isLight ? '#ffffff' : '#141928';
-  const tooltipBorder = isLight ? '#e2e8f0' : 'rgba(255,255,255,0.08)';
-  const tooltipTitle = isLight ? '#0f172a' : '#e8edf5';
+  const textColor = isLight ? '#475569' : '#cbd5e1';
+  const labelColor = isLight ? '#334155' : '#e2e8f0';
+  const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)';
+  const tooltipBg = isLight ? '#ffffff' : '#1e293b';
+  const tooltipBorder = isLight ? '#cbd5e1' : 'rgba(255,255,255,0.15)';
+  const tooltipTitle = isLight ? '#0f172a' : '#f8fafc';
+
+  if (typeof Chart !== 'undefined') {
+    Chart.defaults.color = textColor;
+  }
 
   return {
     responsive: true,
     maintainAspectRatio: false,
+    color: textColor,
     plugins: {
       legend: {
         position: isDonut ? 'right' : 'bottom',
         labels: {
-          color: textColor,
+          color: labelColor,
+          fontColor: labelColor,
           boxWidth: 12,
           padding: 16,
-          font: { family: 'Inter', size: 12 }
+          font: { family: "'Plus Jakarta Sans', Inter, sans-serif", size: 12, weight: '500' }
         }
       },
       tooltip: {
@@ -171,16 +178,18 @@ window.chartDefaults = function(type) {
         titleColor: tooltipTitle,
         bodyColor: textColor,
         padding: 12,
+        titleFont: { family: "'Plus Jakarta Sans', Inter, sans-serif", weight: 'bold' },
+        bodyFont: { family: "'Plus Jakarta Sans', Inter, sans-serif" }
       }
     },
     scales: isDonut ? undefined : {
       x: {
         grid: { color: gridColor },
-        ticks: { color: textColor, font: { family: 'Inter', size: 11 } }
+        ticks: { color: textColor, font: { family: "'Plus Jakarta Sans', Inter, sans-serif", size: 11 } }
       },
       y: {
         grid: { color: gridColor },
-        ticks: { color: textColor, font: { family: 'Inter', size: 11 } }
+        ticks: { color: textColor, font: { family: "'Plus Jakarta Sans', Inter, sans-serif", size: 11 } }
       }
     }
   };

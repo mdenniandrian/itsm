@@ -436,54 +436,116 @@ window.openScreenFullscreen = function() {
   window.open(img.src, '_blank');
 };
 
-window.showEnrollDeviceModal = function() {
+window.showEnrollDeviceModal = function(initialTab = 'install') {
   const host = window.location.origin;
   modal.show(`
     <div class="modal-header">
-      <span class="modal-title font-bold text-sm">Enroll Client Machine (Endpoint Agent)</span>
+      <div class="flex items-center gap-2">
+        <span class="modal-title font-bold text-sm">ITSM Endpoint Agent Setup & Uninstall Guide</span>
+      </div>
       <button class="modal-close" onclick="modal.close()">✕</button>
     </div>
     <div class="modal-body">
-      <p class="text-xs text-secondary mb-4">
-        Run the following command in the client terminal/shell to activate telemetry and live monitoring:
-      </p>
+      <!-- Tabs Navigation -->
+      <div class="flex gap-2 mb-4 p-1" style="background:var(--bg-input);border-radius:8px;border:1px solid var(--border-primary)">
+        <button class="btn btn-sm ${initialTab === 'install' ? 'btn-primary' : 'btn-secondary'}" style="flex:1" id="tab-btn-install" onclick="switchAgentModalTab('install')">
+          ${renderIcon('download')}
+          <span>1. Install & Auto-Start Agent</span>
+        </button>
+        <button class="btn btn-sm ${initialTab === 'uninstall' ? 'btn-danger' : 'btn-secondary'}" style="flex:1" id="tab-btn-uninstall" onclick="switchAgentModalTab('uninstall')">
+          ${renderIcon('trash')}
+          <span>2. Uninstall & Remove Agent</span>
+        </button>
+      </div>
 
-      <!-- Option 1: macOS & Linux -->
-      <div class="mb-4">
-        <label class="form-label font-medium text-xs flex items-center gap-2">
-          <span>macOS / Linux (Terminal):</span>
-        </label>
-        <div style="position:relative">
-          <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/install-agent.sh | bash -s "${host}"</pre>
-          <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('curl -sSL ${host}/agent/install-agent.sh | bash -s &quot;${host}&quot;')">Copy</button>
+      <!-- Tab 1: Install & Enroll -->
+      <div id="tab-content-install" style="display:${initialTab === 'install' ? 'block' : 'none'}">
+        <p class="text-xs text-secondary mb-3">
+          Run the command below in the client computer terminal/PowerShell. The agent will auto-install as a persistent background daemon and register with your ITSM server:
+        </p>
+
+        <!-- macOS & Linux Install -->
+        <div class="mb-4">
+          <label class="form-label font-medium text-xs flex items-center gap-2">
+            <span>🍏 macOS & 🐧 Linux (Terminal):</span>
+          </label>
+          <div style="position:relative">
+            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/install-agent.sh | bash -s "${host}"</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('curl -sSL ${host}/agent/install-agent.sh | bash -s &quot;${host}&quot;')">Copy</button>
+          </div>
+          <div class="text-xs text-muted mt-1">Registers macOS LaunchAgent / Linux Systemd user service named <code>itsm-agent</code>.</div>
+        </div>
+
+        <!-- Windows Install -->
+        <div class="mb-4">
+          <label class="form-label font-medium text-xs flex items-center gap-2">
+            <span>🪟 Windows (PowerShell):</span>
+          </label>
+          <div style="position:relative">
+            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/install-agent.ps1" | iex }</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('&amp; { $h=\x27${host}\x27; irm \x22$h/agent/install-agent.ps1\x22 | iex }')">Copy</button>
+          </div>
+          <div class="text-xs text-muted mt-1">Registers Windows Scheduled Task <code>ITSMEndpointAgent</code> running <code>itsm-agent.exe</code> on logon.</div>
         </div>
       </div>
 
-      <!-- Option 2: Windows PowerShell -->
-      <div class="mb-4">
-        <label class="form-label font-medium text-xs flex items-center gap-2">
-          <span>Windows (PowerShell as Admin / User):</span>
-        </label>
-        <div style="position:relative">
-          <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#a5b4fc;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/install-agent.ps1" | iex }</pre>
-          <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('&amp; { $h=\x27${host}\x27; irm \x22$h/agent/install-agent.ps1\x22 | iex }')">Copy</button>
+      <!-- Tab 2: Uninstall & Stop -->
+      <div id="tab-content-uninstall" style="display:${initialTab === 'uninstall' ? 'block' : 'none'}">
+        <div class="p-3 mb-3" style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);border-radius:8px">
+          <div class="font-bold text-xs text-danger mb-1">🛑 How to Permanently Stop & Remove Agent from Client Machine:</div>
+          <p class="text-xs text-secondary" style="line-height:1.5">
+            If you delete a device from this portal without uninstalling the daemon on the client machine, the agent will auto-reconnect. Run the uninstall command below on the client machine first:
+          </p>
         </div>
-      </div>
 
-      <!-- Option 3: Manual Python Script -->
-      <div class="p-3" style="background:rgba(99,102,241,0.06);border-radius:8px;border:1px solid rgba(99,102,241,0.15)">
-        <div class="font-bold text-xs text-accent mb-1">Manual Python Script Option:</div>
-        <p class="text-xs text-muted mb-2">Download the agent script, then execute with your production server URL:</p>
-        <div class="flex items-center gap-2 flex-wrap">
-          <a href="/agent/itsm-agent.py" download="itsm-agent.py" class="btn btn-secondary btn-sm">Download itsm-agent.py</a>
-          <code class="text-xs p-1.5" style="background:var(--bg-card);border-radius:4px;color:var(--text-secondary)">python3 itsm-agent.py ${host}</code>
+        <!-- macOS & Linux Uninstall -->
+        <div class="mb-4">
+          <label class="form-label font-medium text-xs flex items-center gap-2">
+            <span>🍏 macOS & 🐧 Linux (Terminal):</span>
+          </label>
+          <div style="position:relative">
+            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#fda4af;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">curl -sSL ${host}/agent/uninstall-agent.sh | bash</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('curl -sSL ${host}/agent/uninstall-agent.sh | bash')">Copy</button>
+          </div>
+          <div class="text-xs text-muted mt-1">Unloads LaunchAgent plist, terminates running processes, and cleans up tokens.</div>
+        </div>
+
+        <!-- Windows Uninstall -->
+        <div class="mb-4">
+          <label class="form-label font-medium text-xs flex items-center gap-2">
+            <span>🪟 Windows (PowerShell):</span>
+          </label>
+          <div style="position:relative">
+            <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.75rem;border-radius:6px;color:#fda4af;font-size:0.8rem;overflow-x:auto;white-space:pre-wrap">&amp; { $h='${host}'; irm "$h/agent/uninstall-agent.ps1" | iex }</pre>
+            <button class="btn btn-secondary btn-xs" style="position:absolute;top:6px;right:6px" onclick="copyCommand('&amp; { $h=\x27${host}\x27; irm \x22$h/agent/uninstall-agent.ps1\x22 | iex }')">Copy</button>
+          </div>
+          <div class="text-xs text-muted mt-1">Unregisters scheduled task, kills process, and removes local folder.</div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" onclick="modal.close();loadDevicesList()">Done & Check New Devices</button>
+      <button class="btn btn-primary" onclick="modal.close();loadDevicesList()">Close & Refresh List</button>
     </div>
   `, { size: 'modal-lg' });
+};
+
+window.switchAgentModalTab = function(tab) {
+  const installTab = document.getElementById('tab-content-install');
+  const uninstallTab = document.getElementById('tab-content-uninstall');
+  const installBtn = document.getElementById('tab-btn-install');
+  const uninstallBtn = document.getElementById('tab-btn-uninstall');
+
+  if (tab === 'install') {
+    if (installTab) installTab.style.display = 'block';
+    if (uninstallTab) uninstallTab.style.display = 'none';
+    if (installBtn) installBtn.className = 'btn btn-sm btn-primary';
+    if (uninstallBtn) uninstallBtn.className = 'btn btn-sm btn-secondary';
+  } else {
+    if (installTab) installTab.style.display = 'none';
+    if (uninstallTab) uninstallTab.style.display = 'block';
+    if (installBtn) installBtn.className = 'btn btn-sm btn-secondary';
+    if (uninstallBtn) uninstallBtn.className = 'btn btn-sm btn-danger';
+  }
 };
 
 window.copyCommand = function(text) {
@@ -681,13 +743,48 @@ window.submitEditDevice = async function(id) {
 };
 
 window.deleteDevice = function(id) {
-  modal.confirm('Delete Device', 'This device will be permanently removed from monitoring.', async () => {
-    try {
-      await devicesApi.delete(id);
-      toast.success('Device deleted successfully');
-      loadDevicesList();
-    } catch(e) {
-      toast.error('Failed to delete device', e.message);
-    }
-  });
+  const host = window.location.origin;
+  modal.show(`
+    <div class="modal-header">
+      <span class="modal-title font-bold text-sm text-danger flex items-center gap-2">
+        ${renderIcon('trash')}
+        <span>Delete Device from Monitoring</span>
+      </span>
+      <button class="modal-close" onclick="modal.close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-xs text-secondary mb-3">
+        Are you sure you want to delete this device from the monitoring dashboard?
+      </p>
+
+      <div class="p-3 mb-3" style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.25);border-radius:8px">
+        <div class="font-bold text-xs text-danger mb-1 flex items-center gap-1.5">
+          <span>⚠️ Important: Stop Agent on the Client Machine!</span>
+        </div>
+        <p class="text-xs text-secondary mb-2" style="line-height:1.5">
+          If the <code>itsm-agent</code> service is still running in the background of that computer, it will automatically re-register upon its next heartbeat.
+          To permanently stop and remove it from that machine:
+        </p>
+        <div style="position:relative">
+          <pre style="background:var(--bg-card);border:1px solid var(--border-primary);padding:0.5rem;border-radius:6px;color:#fda4af;font-size:0.75rem;overflow-x:auto">curl -sSL ${host}/agent/uninstall-agent.sh | bash</pre>
+          <button class="btn btn-secondary btn-xs" style="position:absolute;top:4px;right:4px" onclick="copyCommand('curl -sSL ${host}/agent/uninstall-agent.sh | bash')">Copy</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="modal.close()">Cancel</button>
+      <button class="btn btn-danger" onclick="executeDeleteDevice(${id})">Delete Device Now</button>
+    </div>
+  `);
+};
+
+window.executeDeleteDevice = async function(id) {
+  try {
+    await devicesApi.delete(id);
+    modal.close();
+    toast.success('Device deleted successfully');
+    loadDevicesList();
+  } catch(e) {
+    toast.error('Failed to delete device', e.message);
+  }
 };

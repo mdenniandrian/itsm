@@ -299,21 +299,33 @@ Buka browser Anda dan akses domain yang telah dikonfigurasi:
 
 ---
 
-### Langkah 8: Hubungkan Endpoint Agent di Komputer Client
+### Langkah 8: Hubungkan / Lepas Endpoint Agent di Komputer Client
 
 Untuk memantau perangkat client secara live (CPU, RAM, Disk, Active App, Live Screen Preview), pasang agent di komputer client:
 
-#### 🍏 **macOS & 🐧 Linux (Terminal):**
-```bash
-curl -sSL https://itsm.yourcompany.com/agent/install-agent.sh | bash -s "https://itsm.yourcompany.com"
-```
-*(Otomatis mendaftarkan daemon **macOS LaunchAgent** / **Linux Systemd** bernama `itsm-agent` yang otomatis hidup setiap kali komputer booting/reboot).*
+#### 🚀 Pemasangan Agent (Install & Auto-Start):
+- **🍏 macOS & 🐧 Linux (Terminal):**
+  ```bash
+  curl -sSL https://itsm.yourcompany.com/agent/install-agent.sh | bash -s "https://itsm.yourcompany.com"
+  ```
+  *(Otomatis mendaftarkan daemon **macOS LaunchAgent** / **Linux Systemd** bernama `itsm-agent` yang otomatis hidup setiap kali booting/reboot).*
 
-#### 🪟 **Windows (PowerShell):**
-```powershell
-& { $h='https://itsm.yourcompany.com'; irm "$h/agent/install-agent.ps1" | iex }
-```
-*(Otomatis mendaftarkan **Windows Task Scheduler** bernama `ITSMEndpointAgent` yang menjalankan `itsm-agent.exe` saat user login).*
+- **🪟 Windows (PowerShell):**
+  ```powershell
+  & { $h='https://itsm.yourcompany.com'; irm "$h/agent/install-agent.ps1" | iex }
+  ```
+  *(Otomatis mendaftarkan **Windows Task Scheduler** bernama `ITSMEndpointAgent` yang menjalankan `itsm-agent.exe` saat login).*
+
+#### 🛑 Pelepasan Agent (Uninstall & Stop Permanen):
+Jika ingin berhenti memantau komputer tersebut sebelum menghapusnya dari dashboard portal:
+- **🍏 macOS & 🐧 Linux (Terminal):**
+  ```bash
+  curl -sSL https://itsm.yourcompany.com/agent/uninstall-agent.sh | bash
+  ```
+- **🪟 Windows (PowerShell):**
+  ```powershell
+  & { $h='https://itsm.yourcompany.com'; irm "$h/agent/uninstall-agent.ps1" | iex }
+  ```
 
 ---
 
