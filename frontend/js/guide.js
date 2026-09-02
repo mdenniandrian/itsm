@@ -1,5 +1,5 @@
 /**
- * ITSM ENTERPRISE - COMPREHENSIVE SYSTEM FEATURES & MULTI-ROLE USAGE GUIDE
+ * ITSM ENTERPRISE - STRICT ROLE-ISOLATED FEATURES & SYSTEM GUIDE
  */
 
 window.featuresData = [
@@ -96,7 +96,6 @@ window.featuresData = [
     purpose: 'Memberikan visibilitas kepada Manajer dan Direktur IT mengenai efisiensi tim IT: Berapa tiket yang sukses diselesaikan tepat waktu? Siapa teknisi paling produktif? Departemen mana yang paling sering mengalami kendala teknis?',
     scenario: 'Setiap akhir bulan, IT Manager membuka halaman KPI untuk mengunduh laporan bulanan. Terlihat bahwa 98.4% tiket terpenuhi sesuai SLA dan nilai rata-rata kepuasan pengguna (CSAT) mencapai 4.9/5.0.',
     roleGuidance: {
-      user: 'Khusus staf IT & Pimpinan (Karyawan umum dapat melihat status penyelesaian tiket pribadinya di My Tickets).',
       agent: 'Pantau kecepatan waktu respon (First Response) dan pencapaian target SLA resolusi harian Anda.',
       manager: 'Analisis beban kerja tim, kepatuhan SLA keseluruhan, dan tren rating kepuasan CSAT pelanggan.',
       admin: 'Evaluasi metrik efisiensi operasional IT secara menyeluruh untuk bahan laporan audit manajemen.'
@@ -123,7 +122,6 @@ window.featuresData = [
     purpose: 'Mencegah kerusakan server dan mendeteksi komputer karyawan yang bermasalah sebelum komplain terjadi (misal: harddisk hampir penuh 95% atau CPU terus-menerus 100%). IT bisa langsung proaktif mengambil tindakan pencegahan.',
     scenario: 'Server database produksi mengalami lonjakan penggunaan memori RAM hingga 92%. Agen RMM mendeteksi lonjakan tersebut dan status server di panel langsung menyala kuning/merah sehingga admin segera melakukan optimasi query.',
     roleGuidance: {
-      user: 'Fitur pemantauan otomatis (Karyawan cukup mengizinkan instalasi agen ringan pada laptop kantor).',
       agent: 'Pantau kesehatan mesin klien (CPU/RAM/Disk), identifikasi laptop yang lelet, dan daftarkan mesin baru.',
       manager: 'Pantau total inventaris server & workstation aktif serta tingkat utilisasi hardware perusahaan.',
       admin: 'Kelola token enroll perangkat, salin script instalasi/uninstall lintas OS (Mac/Linux/Windows).'
@@ -150,7 +148,6 @@ window.featuresData = [
     purpose: 'Mempercepat investigasi tim infrastruktur dan jaringan saat terjadi gangguan koneksi internet, port server tertutup, sertifikat SSL kedaluwarsa, atau kebutuhan membuat kata sandi rumit yang aman.',
     scenario: 'Karyawan mengeluhkan tidak bisa mengakses aplikasi internal di kantor cabang. Teknisi membuka menu Tools, melakukan Ping tester dan Port Scanner ke server cabang, dan langsung tahu bahwa port 443 terblokir oleh firewall lokal.',
     roleGuidance: {
-      user: 'Khusus staf teknis (Karyawan dapat melaporkan kendala koneksi melalui form tiket).',
       agent: 'Gunakan Ping Tester, Port Scanner, dan DNS Lookup untuk investigasi cepat gangguan jaringan.',
       manager: 'Pantau masa berlaku sertifikat SSL domain perusahaan agar tidak terjadi gangguan expired.',
       admin: 'Gunakan generator password kuat, inspektur token JWT/Base64, dan pengujian koneksi server.'
@@ -178,7 +175,6 @@ window.featuresData = [
     purpose: 'Mencegah terjadinya insiden atau pemadaman sistem (*system outage*) akibat teknisi melakukan perubahan server tanpa rencana mitigasi risiko dan tanpa rencana pembatalan (*rollback plan*) yang jelas.',
     scenario: 'Tim SysAdmin ingin melakukan upgrade versi database MySQL pada server utama. Rencana perubahan diajukan ke menu Changes, dinilai risikonya oleh dewan CAB, disetujui, dan dijadwalkan pada jendela pemeliharaan malam hari.',
     roleGuidance: {
-      user: 'Dampak perubahan dijadwalkan pada jam non-kerja agar karyawan tidak terganggu saat bekerja.',
       agent: 'Ajukan proposal perubahan teknis lengkap dengan rencana mitigasi risiko dan langkah rollback.',
       manager: 'Bertindak sebagai dewan CAB untuk meninjau, menyetujui, atau menolak pengajuan perubahan server.',
       admin: 'Otorisasi perubahan darurat (Emergency Change) dan evaluasi pasca-implementasi perubahan.'
@@ -204,7 +200,6 @@ window.featuresData = [
     purpose: 'Berbeda dengan Tiket yang fokus pada "penanganan cepat sementara", Problem Management fokus pada "mencari akar masalah utama agar gangguan yang sama tidak pernah terjadi lagi di masa depan".',
     scenario: 'Printer di lantai 3 mati mendadak 5 kali dalam seminggu. Tim IT membuka Problem Record, melakukan investigasi RCA, dan menemukan bahwa kabel power regulator di stopkontak dinding longgar. Setelah diganti, printer tidak pernah mati lagi.',
     roleGuidance: {
-      user: 'Membantu pengguna dengan melenyapkan gangguan berulang sehingga sistem kantor selalu stabil.',
       agent: 'Lakukan investigasi teknis mendalam (RCA) dan catat solusi sementara di database Known Error.',
       manager: 'Tinjau problem aktif yang memiliki dampak finansial/operasional tinggi dan alokasikan sumber daya.',
       admin: 'Kaitkan insiden-insiden berulang menjadi satu problem record induk untuk penyelesaian tuntas.'
@@ -229,7 +224,6 @@ window.featuresData = [
     purpose: 'Menghindari hilangnya laptop kantor, mengetahui masa garansi hardware, memonitor sisa lisensi software perusahaan, dan mengetahui riwayat siapa saja karyawan yang pernah memegang laptop tertentu.',
     scenario: 'Karyawan bagian Akuntansi mengundurkan diri (*resign*). Tim HR dan IT membuka menu Asset Inventory dan langsung melihat daftar barang kantor yang wajib dikembalikan: 1 unit laptop ThinkPad T14 (Serial #PF2A...) dan 1 unit headset USB.',
     roleGuidance: {
-      user: 'Melihat inventaris perangkat laptop atau alat kantor yang resmi ditugaskan atas nama Anda.',
       agent: 'Catat penerimaan aset baru, update lokasi perangkat, dan perbarui status perbaikan alat.',
       manager: 'Audit ketersediaan stok laptop cadangan dan rencanakan peremajaan hardware yang habis garansi.',
       admin: 'Kelola master data aset, alokasi lisensi software korporat, dan proses penghapusan aset lama.'
@@ -254,8 +248,6 @@ window.featuresData = [
     purpose: 'Menjaga keamanan akun perusahaan. Memastikan email yang didaftarkan benar-benar aktif di DNS global (bukan email dummy/palsu), mengirim email sambutan kredensial login otomatis, serta memiliki Session Security Manager untuk memutuskan sesi login / Force Logout perangkat yang hilang/diretas.',
     scenario: 'Laptop staf IT hilang di perjalanan. Admin segera membuka menu User Management &rarr; klik tombol Sessions pada nama staf tersebut &rarr; klik "Clear All Sessions (Force Logout)". Seketika semua sesi login di laptop yang hilang tersebut langsung mati total.',
     roleGuidance: {
-      user: 'Akun Anda dilindungi dengan standar keamanan email terverifikasi dan proteksi sesi aktif.',
-      agent: 'Dapatkan tagging spesialisasi teknisi (Helpdesk, Jaringan, SysAdmin) pada profil kerja Anda.',
       manager: 'Daftarkan anggota tim baru dan kelola hak akses staf sesuai divisi kerjanya.',
       admin: 'Kendali penuh manajemen user, verifikasi DNS email, reset password, dan Force Logout sesi aktif.'
     },
@@ -282,8 +274,6 @@ window.featuresData = [
     purpose: 'Membuat aplikasi portal ITSM ini terasa 100% seperti buatan in-house perusahaan Anda sendiri (*white-label*) dengan identitas merek, logo, hak cipta footer, dan warna tema korporat Anda.',
     scenario: 'Perusahaan memiliki warna korporat Hijau. Admin memilih tema Cyber Emerald di Brand Studio &rarr; seketika seluruh tombol, gradien, chart, dan ikon favicon di tab browser atas langsung berubah warna hijau serasi.',
     roleGuidance: {
-      user: 'Menikmati antarmuka portal yang elegan, profesional, dan serasi dengan warna korporat kantor.',
-      agent: 'Bekerja dengan visual dashboard yang nyaman di mata dengan mode gelap kontras tinggi.',
       manager: 'Memastikan identitas merek dan nama portal sesuai dengan panduan branding perusahaan.',
       admin: 'Kustomisasi logo, favicon dinamis, nama aplikasi, copyright footer, dan 1-click preset warna.'
     },
@@ -309,8 +299,6 @@ window.featuresData = [
     purpose: 'Menghubungkan ITSM dengan ekosistem komunikasi kantor yang sudah ada. Teknisi tidak perlu terus-menerus memelototi dashboard karena notifikasi tiket baru langsung berbunyi di HP via bot Telegram dan email kantor.',
     scenario: 'Ketika ada karyawan yang submit tiket prioritas Critical, bot Telegram otomatis mengirimkan pesan alert ke grup Telegram IT Support dalam waktu 1 detik, dan email konfirmasi otomatis terkirim ke inbox pemohon.',
     roleGuidance: {
-      user: 'Menerima konfirmasi instan lewat email kantor setiap kali tiket Anda dibuat atau selesai.',
-      agent: 'Dapatkan notifikasi darurat langsung di HP via bot Telegram saat ada tiket baru yang ditugaskan.',
       manager: 'Pantau broadcast alert insiden kritis di grup chat Telegram pimpinan IT.',
       admin: 'Konfigurasi SMTP Gateway (Zimbra/Gmail), bot Telegram, LDAP/Active Directory SSO, & Webhooks.'
     },
@@ -335,8 +323,6 @@ window.featuresData = [
     purpose: 'Memenuhi standar kepatuhan audit keamanan TI perusahaan (ISO 27001). Jika terjadi insiden penghapusan data atau perubahan hak akses mencurigakan, admin bisa melacak siapa pelakunya, dari IP mana, jam berapa, dan apa data sebelum diubah.',
     scenario: 'Manajer ingin mengetahui siapa yang mengubah prioritas tiket dari Low menjadi Critical. Di Audit Log, tercatat jelas nama akun yang mengubah, dari komputer mana, jam berapa, dan nilai data sebelum vs sesudah diubah.',
     roleGuidance: {
-      user: 'Menjamin seluruh aktivitas dan data pribadi Anda terlindungi serta tercatat secara aman.',
-      agent: 'Setiap aksi penyelesaian tiket tercatat sebagai bukti profesionalitas kinerja kerja Anda.',
       manager: 'Audit kepatuhan SOP tim dan investigasi perubahan status tiket yang tidak wajar.',
       admin: 'Pantau log keamanan penuh, filter berdasarkan alamat IP, dan unduh laporan audit dalam format CSV.'
     },
@@ -351,28 +337,34 @@ window.featuresData = [
 
 function getRoleGuidanceSummary(role) {
   const summaries = {
-    user: 'Sebagai <b>User (Karyawan)</b>, Anda dapat menggunakan <b>Service Catalog</b> untuk meminta fasilitas kerja baru, memantau kendala di <b>Service Desk</b>, dan mencari solusi cepat di <b>Knowledge Base</b>.',
+    user: 'Sebagai <b>User (Karyawan)</b>, Anda dapat menggunakan <b>Service Catalog</b> untuk mengajukan fasilitas kerja baru, memantau & membuat tiket keluhan di <b>Service Desk</b>, dan membaca solusi mandiri di <b>Knowledge Base</b>.',
     agent: 'Sebagai <b>Agent (Teknisi IT)</b>, Anda bertugas mengeksekusi penyelesaian tiket keluhan, menulis catatan investigasi, memantau telemetri mesin di <b>Device Monitoring (RMM)</b>, dan menggunakan <b>IT Diagnostic Tools</b>.',
     manager: 'Sebagai <b>Manager (Pimpinan IT)</b>, Anda mengawasi kinerja operasional di <b>KPI Analytics</b>, memvalidasi persetujuan perubahan server di <b>CAB Changes</b>, meninjau akar masalah di <b>Problem Management</b>, dan mengelola <b>Asset Inventory</b>.',
-    admin: 'Sebagai <b>Super Administrator</b>, Anda memegang kendali penuh atas seluruh 13 modul: kustomisasi <b>Brand Studio</b>, manajemen <b>User & Force Logout Sesi</b>, integrasi <b>Add-ons (SMTP/Telegram/LDAP)</b>, dan <b>Audit Security Logs</b>.'
+    admin: 'Sebagai <b>Super Administrator</b>, Anda memegang kendali penuh atas seluruh modul: kustomisasi <b>Brand Studio</b>, manajemen <b>User & Force Logout Sesi</b>, integrasi <b>Add-ons (SMTP/Telegram/LDAP)</b>, dan <b>Audit Security Logs</b>.'
   };
   return summaries[role] || summaries.user;
 }
+
+window.getPermittedFeaturesForRole = function(role) {
+  const r = (role || 'user').toLowerCase();
+  return window.featuresData.filter(f => f.roles.includes(r));
+};
 
 window.loadSystemGuide = function() {
   const content = document.getElementById('page-content');
   if (!content) return;
 
   const userRole = (appState.user && appState.user.role) ? appState.user.role.toLowerCase() : 'user';
+  const permittedFeatures = window.getPermittedFeaturesForRole(userRole);
 
   content.innerHTML = `
     <div class="page-header" style="margin-bottom:1.25rem">
       <div>
         <div class="flex items-center gap-2 mb-1">
           <span style="font-size:1.6rem">📖</span>
-          <h1 class="page-title" style="margin:0">Panduan Fitur & Dokumentasi Sistem (Multi-Role)</h1>
+          <h1 class="page-title" style="margin:0">Panduan Fitur & Layanan Sistem (${userRole.toUpperCase()})</h1>
         </div>
-        <p class="page-subtitle">Panduan komprehensif mengenai fungsi, manfaat bisnis, skenario penggunaan nyata, dan alur kerja untuk setiap peran pengguna</p>
+        <p class="page-subtitle">Panduan komprehensif mengenai fungsi, manfaat, dan alur kerja fitur yang dapat diakses oleh akun Anda</p>
       </div>
       <div class="flex gap-2">
         <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">
@@ -386,23 +378,19 @@ window.loadSystemGuide = function() {
     <div class="card p-3 mb-4" style="background:linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.08) 100%);border:1px solid var(--border-primary)">
       <div class="flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
-          <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;flex-shrink:0">
+          <div style="width:42px;height:42px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:bold;flex-shrink:0">
             ${userRole === 'admin' ? '👑' : userRole === 'manager' ? '👔' : userRole === 'agent' ? '🛠️' : '👤'}
           </div>
           <div>
             <div class="flex items-center gap-2">
               <span class="font-bold text-xs">Peran Akun Anda:</span>
               <span class="badge badge-primary font-bold text-xs" style="text-transform:uppercase;letter-spacing:0.5px">${userRole.toUpperCase()}</span>
+              <span class="badge badge-success text-xs font-semibold" style="font-size:0.65rem">${permittedFeatures.length} Modul Tersedia</span>
             </div>
             <div class="text-xs text-secondary mt-0.5" style="line-height:1.5">
               ${getRoleGuidanceSummary(userRole)}
             </div>
           </div>
-        </div>
-        <div class="flex gap-2">
-          <button class="btn btn-xs btn-primary" onclick="filterGuideRole('${userRole}', this)">
-            ⭐ Khusus Peran Saya (${userRole.toUpperCase()})
-          </button>
         </div>
       </div>
     </div>
@@ -412,23 +400,25 @@ window.loadSystemGuide = function() {
       <div class="flex items-center justify-between flex-wrap gap-3">
         <!-- Search Input -->
         <div class="form-group mb-0" style="flex:1;min-width:280px;position:relative">
-          <input type="text" class="form-control" id="guide-search-input" placeholder="🔍 Cari kegunaan fitur (contoh: SLA, Tiket, Katalog, Knowledge Base)..." oninput="filterGuideFeatures()">
+          <input type="text" class="form-control" id="guide-search-input" placeholder="🔍 Cari kegunaan fitur yang dapat Anda akses..." oninput="filterGuideFeatures()">
         </div>
 
-        <!-- Filter Category Tabs -->
+        <!-- Filter Category Tabs strictly for the role -->
         <div class="flex gap-1.5 flex-wrap" id="guide-category-filters">
-          <button class="btn btn-xs ${userRole !== 'admin' ? 'btn-primary' : 'btn-secondary'} guide-cat-btn" data-category="myrole" onclick="filterGuideRole('${userRole}', this)">
-            ⭐ Fitur Akun Saya (${userRole.toUpperCase()})
+          <button class="btn btn-xs btn-primary guide-cat-btn" data-category="all" onclick="filterGuideCategory('all', this)">
+            ${userRole === 'user' ? `Semua Layanan Karyawan (${permittedFeatures.length})` : `Semua Modul Akun (${permittedFeatures.length})`}
           </button>
-          <button class="btn btn-xs ${userRole === 'admin' ? 'btn-primary' : 'btn-secondary'} guide-cat-btn" data-category="all" onclick="filterGuideCategory('all', this)">
-            Semua Modul Sistem (${window.featuresData.length})
+          
+          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="servicedesk" onclick="filterGuideCategory('servicedesk', this)">
+            Service Desk & Katalog
           </button>
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="servicedesk" onclick="filterGuideCategory('servicedesk', this)">Service Desk</button>
+
           ${userRole !== 'user' ? `
             <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="analytics" onclick="filterGuideCategory('analytics', this)">IT Ops & RMM</button>
             <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="itil" onclick="filterGuideCategory('itil', this)">Standar ITIL</button>
           ` : ''}
-          ${['admin','manager'].includes(userRole) ? `
+
+          ${['admin', 'manager'].includes(userRole) ? `
             <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="security" onclick="filterGuideCategory('security', this)">Keamanan & RBAC</button>
             <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="integrations" onclick="filterGuideCategory('integrations', this)">Integrasi</button>
           ` : ''}
@@ -441,58 +431,61 @@ window.loadSystemGuide = function() {
       <!-- Injected via JavaScript -->
     </div>
 
-    <!-- Role Permission Matrix Section -->
-    <div class="card p-4 mt-6">
-      <div class="flex items-center gap-2 mb-3">
-        <span style="font-size:1.2rem">👥</span>
-        <span class="card-title text-sm font-bold">Matriks Hak Akses & Pembagian Peran Pengguna (Role-Based Access Control)</span>
+    <!-- Role Context Footer Section -->
+    ${userRole === 'user' ? `
+      <div class="card p-4 mt-6">
+        <div class="flex items-center gap-2 mb-2">
+          <span style="font-size:1.2rem">💡</span>
+          <span class="card-title text-sm font-bold">Informasi Layanan Mandiri Karyawan</span>
+        </div>
+        <p class="text-xs text-secondary mb-0" style="line-height:1.6">
+          Sebagai Karyawan, Anda dapat mengajukan permintaan perangkat baru kapan saja melalui <b>Service Catalog</b>, melaporkan gangguan sistem melalui <b>Create Ticket</b>, dan mencari panduan troubleshooting mandiri di <b>Knowledge Base</b>. 
+          Jika membutuhkan bantuan darurat atau eskalasi, silakan hubungi tim IT Support Helpdesk perusahaan.
+        </p>
       </div>
-      <div class="table-responsive">
-        <table class="table text-xs">
-          <thead>
-            <tr>
-              <th>Peran (Role)</th>
-              <th>Pengguna Sasaran</th>
-              <th>Modul yang Dapat Diakses</th>
-              <th>Hak Istimewa & Kewenangan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="${userRole === 'admin' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-              <td><span class="badge badge-primary font-bold">Admin</span> ${userRole === 'admin' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-              <td>IT Director, System Administrator</td>
-              <td><b>Seluruh 13 Modul:</b> Termasuk Brand Studio, Addons, User Management, dan Audit Security Logs</td>
-              <td><span class="text-success font-bold">✓ Kontrol Penuh</span> (Buat/Hapus User, Force Logout Sesi, Setting SMTP/Telegram, White-Label)</td>
-            </tr>
-            <tr style="${userRole === 'manager' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-              <td><span class="badge badge-accent font-bold">Manager</span> ${userRole === 'manager' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-              <td>Helpdesk Lead, Operations Manager</td>
-              <td>Service Desk, KPI Analytics, RMM Devices, CAB Changes, Problems, Assets, KB</td>
-              <td><span class="text-primary font-medium">✓ Otoritas Operasional</span> (Disposisi Tiket, Setujui Perubahan CAB, Pantau Performa Tim)</td>
-            </tr>
-            <tr style="${userRole === 'agent' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-              <td><span class="badge badge-info font-bold">Agent</span> ${userRole === 'agent' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-              <td>IT Support Technician, Network Engineer</td>
-              <td>Service Desk, Troubleshooting Tools, Knowledge Base, Devices Telemetry</td>
-              <td><span class="text-accent font-medium">✓ Penyelesaian Teknis</span> (Update Tiket, Catatan Teknis Internal, Jalankan Diagnostik)</td>
-            </tr>
-            <tr style="${userRole === 'user' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-              <td><span class="badge badge-secondary font-bold">User</span> ${userRole === 'user' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-              <td>Karyawan Umum, Seluruh Staf Perusahaan</td>
-              <td>Service Catalog, Buat Tiket Keluhan, Tiket Saya, Baca Knowledge Base</td>
-              <td><span class="text-muted">Akses Pelapor Saja</span> (Membuat Pengajuan & Menilai Kepuasan Bintang 1-5 Saat Tiket Selesai)</td>
-            </tr>
-          </tbody>
-        </table>
+    ` : `
+      <div class="card p-4 mt-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span style="font-size:1.2rem">👥</span>
+          <span class="card-title text-sm font-bold">Matriks Hak Akses & Pembagian Peran Pengguna (Role-Based Access Control)</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table text-xs">
+            <thead>
+              <tr>
+                <th>Peran (Role)</th>
+                <th>Pengguna Sasaran</th>
+                <th>Modul yang Dapat Diakses</th>
+                <th>Hak Istimewa & Kewenangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="${userRole === 'admin' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
+                <td><span class="badge badge-primary font-bold">Admin</span> ${userRole === 'admin' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
+                <td>IT Director, System Administrator</td>
+                <td><b>Seluruh 13 Modul:</b> Termasuk Brand Studio, Addons, User Management, dan Audit Security Logs</td>
+                <td><span class="text-success font-bold">✓ Kontrol Penuh</span> (Buat/Hapus User, Force Logout Sesi, Setting SMTP/Telegram, White-Label)</td>
+              </tr>
+              <tr style="${userRole === 'manager' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
+                <td><span class="badge badge-accent font-bold">Manager</span> ${userRole === 'manager' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
+                <td>Helpdesk Lead, Operations Manager</td>
+                <td>Service Desk, KPI Analytics, RMM Devices, CAB Changes, Problems, Assets, KB</td>
+                <td><span class="text-primary font-medium">✓ Otoritas Operasional</span> (Disposisi Tiket, Setujui Perubahan CAB, Pantau Performa Tim)</td>
+              </tr>
+              <tr style="${userRole === 'agent' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
+                <td><span class="badge badge-info font-bold">Agent</span> ${userRole === 'agent' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
+                <td>IT Support Technician, Network Engineer</td>
+                <td>Service Desk, Troubleshooting Tools, Knowledge Base, Devices Telemetry</td>
+                <td><span class="text-accent font-medium">✓ Penyelesaian Teknis</span> (Update Tiket, Catatan Teknis Internal, Jalankan Diagnostik)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    `}
   `;
 
-  const initialItems = userRole === 'admin'
-    ? window.featuresData
-    : window.featuresData.filter(f => f.roles.includes(userRole));
-
-  renderGuideCards(initialItems);
+  renderGuideCards(permittedFeatures);
 };
 
 window.renderGuideCards = function(items) {
@@ -506,18 +499,17 @@ window.renderGuideCards = function(items) {
       <div class="p-8 text-center text-muted" style="grid-column:1/-1">
         <div style="font-size:2.2rem;margin-bottom:0.5rem">🔍</div>
         <div class="font-bold text-sm">Tidak ditemukan fitur yang cocok</div>
-        <div class="text-xs">Coba gunakan kata kunci pencarian lain atau klik tombol 'Semua Modul'.</div>
+        <div class="text-xs">Coba gunakan kata kunci pencarian lain atau pilih kategori yang tersedia.</div>
       </div>
     `;
     return;
   }
 
   container.innerHTML = items.map(f => {
-    const isAccessible = f.roles.includes(currentRole);
     const roleTip = (f.roleGuidance && f.roleGuidance[currentRole]) ? f.roleGuidance[currentRole] : f.purpose;
 
     return `
-      <div class="card p-4 feature-card" style="display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--border-primary);border-radius:10px;transition:all 0.2s ease;${!isAccessible ? 'opacity:0.85' : ''}">
+      <div class="card p-4 feature-card" style="display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--border-primary);border-radius:10px;transition:all 0.2s ease">
         <div>
           <!-- Card Header -->
           <div class="flex items-start justify-between gap-2 mb-2.5">
@@ -547,7 +539,7 @@ window.renderGuideCards = function(items) {
                 <span>🎯</span>
                 <span>Untuk Anda (${currentRole.toUpperCase()}):</span>
               </span>
-              ${isAccessible ? '<span class="badge badge-success text-xs" style="font-size:0.6rem">Akses Terbuka</span>' : '<span class="badge badge-secondary text-xs" style="font-size:0.6rem">Akses Terbatas</span>'}
+              <span class="badge badge-success text-xs" style="font-size:0.6rem">Akses Aktif</span>
             </div>
             <div class="text-xs text-secondary" style="line-height:1.5">
               ${escHtml(roleTip)}
@@ -576,35 +568,15 @@ window.renderGuideCards = function(items) {
 
         <!-- Action Button -->
         <div class="pt-2 flex items-center justify-between" style="border-top:1px solid var(--border-primary)">
-          <span class="text-xs text-muted" style="font-size:0.7rem">Akses: <b>${f.roles.map(r => r.toUpperCase()).join(' • ')}</b></span>
-          ${isAccessible ? `
-            <button class="btn btn-primary btn-xs flex items-center gap-1" onclick="navigateTo('${f.targetPage}')">
-              <span>Buka Modul Fitur</span>
-              <span>→</span>
-            </button>
-          ` : `
-            <button class="btn btn-secondary btn-xs" disabled title="Fitur ini diperuntukkan bagi peran teknis (${f.roles.join(', ')})">
-              <span>Akses Khusus ${f.roles[0].toUpperCase()}</span>
-            </button>
-          `}
+          <span class="text-xs text-muted" style="font-size:0.7rem">Modul: <code>#${escHtml(f.id)}</code></span>
+          <button class="btn btn-primary btn-xs flex items-center gap-1" onclick="navigateTo('${f.targetPage}')">
+            <span>Buka Modul Fitur</span>
+            <span>→</span>
+          </button>
         </div>
       </div>
     `;
   }).join('');
-};
-
-window.filterGuideRole = function(role, btnEl) {
-  document.querySelectorAll('.guide-cat-btn').forEach(b => {
-    b.classList.remove('btn-primary');
-    b.classList.add('btn-secondary');
-  });
-  if (btnEl) {
-    btnEl.classList.remove('btn-secondary');
-    btnEl.classList.add('btn-primary');
-  }
-
-  const filtered = window.featuresData.filter(f => f.roles.includes(role.toLowerCase()));
-  renderGuideCards(filtered);
 };
 
 window.filterGuideCategory = function(cat, btnEl) {
@@ -617,8 +589,11 @@ window.filterGuideCategory = function(cat, btnEl) {
     btnEl.classList.add('btn-primary');
   }
 
+  const currentRole = (appState.user && appState.user.role) ? appState.user.role.toLowerCase() : 'user';
+  const permitted = window.getPermittedFeaturesForRole(currentRole);
+
   const searchVal = document.getElementById('guide-search-input')?.value.toLowerCase().trim() || '';
-  let filtered = window.featuresData;
+  let filtered = permitted;
   if (cat !== 'all') {
     filtered = filtered.filter(f => f.category === cat);
   }
@@ -626,8 +601,9 @@ window.filterGuideCategory = function(cat, btnEl) {
     filtered = filtered.filter(f => 
       f.title.toLowerCase().includes(searchVal) || 
       f.summary.toLowerCase().includes(searchVal) || 
-      f.purpose.toLowerCase().includes(searchVal) ||
-      f.scenario.toLowerCase().includes(searchVal) ||
+      f.purpose.toLowerCase().includes(searchVal) || 
+      f.scenario.toLowerCase().includes(searchVal) || 
+      f.categoryName.toLowerCase().includes(searchVal) ||
       f.capabilities.some(c => c.toLowerCase().includes(searchVal))
     );
   }
@@ -635,25 +611,23 @@ window.filterGuideCategory = function(cat, btnEl) {
 };
 
 window.filterGuideFeatures = function() {
+  const currentRole = (appState.user && appState.user.role) ? appState.user.role.toLowerCase() : 'user';
+  const permitted = window.getPermittedFeaturesForRole(currentRole);
+
   const searchVal = document.getElementById('guide-search-input')?.value.toLowerCase().trim() || '';
   const activeCatBtn = document.querySelector('.guide-cat-btn.btn-primary');
   const cat = activeCatBtn ? activeCatBtn.dataset.category : 'all';
 
-  let filtered = window.featuresData;
+  let filtered = permitted;
   if (cat && cat !== 'all') {
-    if (cat === 'myrole') {
-      const currentRole = (appState.user && appState.user.role) ? appState.user.role.toLowerCase() : 'user';
-      filtered = filtered.filter(f => f.roles.includes(currentRole));
-    } else {
-      filtered = filtered.filter(f => f.category === cat);
-    }
+    filtered = filtered.filter(f => f.category === cat);
   }
   if (searchVal) {
     filtered = filtered.filter(f => 
       f.title.toLowerCase().includes(searchVal) || 
       f.summary.toLowerCase().includes(searchVal) || 
       f.purpose.toLowerCase().includes(searchVal) || 
-      f.scenario.toLowerCase().includes(searchVal) ||
+      f.scenario.toLowerCase().includes(searchVal) || 
       f.categoryName.toLowerCase().includes(searchVal) ||
       f.capabilities.some(c => c.toLowerCase().includes(searchVal))
     );
