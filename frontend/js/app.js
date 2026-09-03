@@ -232,14 +232,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderAppShell();
 
   // Setup topbar user
-  renderTopbarUser();
-
   // Setup navigation
   setupNavigation();
 
-  // Load initial page
-  const hash = window.location.hash.slice(1) || 'dashboard';
-  navigateTo(hash);
+  // Load initial page using clean URL routing
+  const initialPage = getCurrentPageFromUrl();
+  if (window.location.pathname.endsWith('app.html') || window.location.pathname === '/app') {
+    try {
+      window.history.replaceState({ page: initialPage }, '', '/' + initialPage);
+    } catch(e) {}
+  }
+  navigateTo(initialPage);
 
   // Start SSE notifications
   startSSE();
@@ -539,8 +542,24 @@ function renderAppShell() {
 function renderTopbarUser() {}
 
 // ============================================
-// NAVIGATION / ROUTING
+// NAVIGATION / ROUTING (Clean HTML5 History API)
 // ============================================
+function getCurrentPageFromUrl() {
+  // Extract path (e.g. /changes, /assets, /tickets, /kpi, /dashboard, /home)
+  let path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+  if (path === 'app.html' || path === 'app' || path === '' || path === 'home') {
+    const hash = window.location.hash.slice(1);
+    return hash || 'dashboard';
+  }
+  if (path === 'asset') return 'assets';
+  if (path === 'change') return 'changes';
+  if (path === 'ticket') return 'tickets';
+  if (path) {
+    return path;
+  }
+  return window.location.hash.slice(1) || 'dashboard';
+}
+
 function setupNavigation() {
   document.addEventListener('click', (e) => {
     const navItem = e.target.closest('[data-page]');
@@ -553,28 +572,55 @@ function setupNavigation() {
     }
   });
 
-  window.addEventListener('hashchange', () => {
-    const page = window.location.hash.slice(1) || 'dashboard';
-    loadPage(page);
+  // Handle browser Back / Forward navigation
+  window.addEventListener('popstate', (e) => {
+    const page = (e.state && e.state.page) ? e.state.page : getCurrentPageFromUrl();
+    loadPage(page, (e.state && e.state.params) || {});
     updateActiveNav(page);
+  });
+
+  // Fallback hash support
+  window.addEventListener('hashchange', () => {
+    const page = window.location.hash.slice(1);
+    if (page) {
+      navigateTo(page);
+    }
   });
 }
 
 function navigateTo(page, params = {}) {
-  const currentHash = window.location.hash.slice(1);
-  if (currentHash === page) {
-    loadPage(page, params);
-  } else {
-    window.location.hash = page;
+  if (!page) page = 'dashboard';
+  if (page === 'home') page = 'dashboard';
+  if (page === 'asset') page = 'assets';
+  if (page === 'change') page = 'changes';
+  if (page === 'ticket') page = 'tickets';
+
+  // Push clean URL to browser address bar (e.g. /changes, /assets, /tickets)
+  const targetPath = '/' + page;
+  if (window.location.pathname !== targetPath) {
+    try {
+      window.history.pushState({ page, params }, '', targetPath);
+    } catch(e) {
+      window.location.hash = page;
+    }
   }
+
+  loadPage(page, params);
+  updateActiveNav(page);
 }
 
 function updateActiveNav(page) {
+  if (page === 'home') page = 'dashboard';
+  if (page === 'asset') page = 'assets';
+  if (page === 'change') page = 'changes';
+  if (page === 'ticket') page = 'tickets';
+
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const activeNav = document.getElementById(`nav-${page}`);
   if (activeNav) activeNav.classList.add('active');
 
   const titles = {
+    home: 'Dashboard',
     dashboard: 'Dashboard',
     kpi: 'KPI & SLA Analytics',
     devices: 'Endpoint & Server Monitoring',
@@ -613,19 +659,29 @@ function loadPage(page, params = {}) {
   appState.charts = {};
 
   const pageLoaders = {
+    home: () => loadDashboard(),
     dashboard: () => loadDashboard(),
     kpi: () => loadKpi(),
+    device: () => loadDevices(),
     devices: () => loadDevices(),
+    tool: () => loadTools(),
     tools: () => loadTools(),
+    ticket: () => loadTickets(params),
     tickets: () => loadTickets(params),
     'new-ticket': () => loadNewTicket(),
+    service: () => loadServices(),
     services: () => loadServices(),
+    change: () => loadChanges(),
     changes: () => loadChanges(),
+    problem: () => loadProblems(),
     problems: () => loadProblems(),
     knowledge: () => loadKnowledge(),
+    asset: () => loadAssets(),
     assets: () => loadAssets(),
+    user: () => loadUsers(),
     users: () => loadUsers(),
     branding: () => typeof window.loadBranding === 'function' && window.loadBranding(),
+    addon: () => loadAddons(),
     addons: () => loadAddons(),
     audit: () => typeof window.loadAuditLogs === 'function' && window.loadAuditLogs(),
     profile: () => loadProfile(),
@@ -657,6 +713,13 @@ function loadPage(page, params = {}) {
     `;
   }
 }
+
+// Global Exports
+window.navigateTo = navigateTo;
+window.loadPage = loadPage;
+window.updateActiveNav = updateActiveNav;
+window.getCurrentPageFromUrl = getCurrentPageFromUrl;
+window.setupNavigation = setupNavigation;
 
 // ============================================
 // TOAST NOTIFICATIONS

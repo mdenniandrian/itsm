@@ -124,17 +124,28 @@ function renderNetworkSubTool() {
         <div class="card-header pb-2">
           <div>
             <h3 class="card-title text-sm font-bold">Ping & Latency Tester</h3>
-            <p class="text-xs text-muted">Test reachability (alive/dead), round-trip latency, and packet loss to remote hosts or IPs</p>
+            <p class="text-xs text-muted">Test reachability, round-trip latency, and packet loss from a specific source interface/IP to a remote destination</p>
           </div>
         </div>
         <div class="card-body">
           <form id="ping-form" onsubmit="event.preventDefault(); executePing();" class="flex gap-3 items-end flex-wrap">
-            <div class="form-group mb-0" style="flex:2;min-width:240px">
-              <label class="form-label text-xs font-medium">Target Host / IP Address *</label>
+            <div class="form-group mb-0" style="flex:2;min-width:230px">
+              <label class="form-label text-xs font-semibold">Target Destination (Host / IP) *</label>
               <input type="text" class="form-control" id="ping-host" placeholder="e.g. 1.1.1.1, google.com, or 192.168.1.1" value="1.1.1.1" required>
             </div>
-            <div class="form-group mb-0" style="width:120px">
-              <label class="form-label text-xs font-medium">Ping Count</label>
+            <div class="form-group mb-0" style="flex:2;min-width:240px">
+              <label class="form-label text-xs font-semibold flex items-center justify-between">
+                <span>Source Address / Interface</span>
+                <span class="text-muted" style="font-size:0.68rem">(Optional)</span>
+              </label>
+              <select class="form-control" id="ping-source-select" onchange="handlePingSourceChange(this)" style="font-size:0.75rem">
+                <option value="">Default (Auto / System Primary IP)</option>
+                <option value="custom">✏️ Custom Specific IP / Interface...</option>
+              </select>
+              <input type="text" class="form-control mt-1.5" id="ping-source-custom" placeholder="e.g. 10.8.0.2, 192.168.1.50, eth0" style="display:none;font-size:0.75rem">
+            </div>
+            <div class="form-group mb-0" style="width:115px">
+              <label class="form-label text-xs font-semibold">Ping Count</label>
               <select class="form-control" id="ping-count">
                 <option value="3">3 Packets</option>
                 <option value="4" selected>4 Packets</option>
@@ -149,7 +160,7 @@ function renderNetworkSubTool() {
 
           <!-- Quick Host Presets -->
           <div class="flex items-center gap-2 mt-3 flex-wrap text-xs">
-            <span class="text-muted">Quick Presets:</span>
+            <span class="text-muted font-medium">Quick Presets:</span>
             <button class="btn btn-ghost btn-xs" onclick="setPingHost('1.1.1.1')">Cloudflare (1.1.1.1)</button>
             <button class="btn btn-ghost btn-xs" onclick="setPingHost('8.8.8.8')">Google DNS (8.8.8.8)</button>
             <button class="btn btn-ghost btn-xs" onclick="setPingHost('192.168.1.1')">Local Gateway (192.168.1.1)</button>
@@ -161,6 +172,8 @@ function renderNetworkSubTool() {
       <!-- Results Viewport -->
       <div id="ping-results-area" style="display:none"></div>
     `;
+
+    setTimeout(() => window.loadPingInterfaces(), 50);
   } else if (sub === 'port') {
     vp.innerHTML = `
       <div class="card mb-6">
@@ -304,15 +317,60 @@ window.handlePortPresetChange = function(val) {
   }
 };
 
+window.loadPingInterfaces = async function() {
+  const selectEl = document.getElementById('ping-source-select');
+  if (!selectEl) return;
+  try {
+    const res = await toolsApi.interfaces();
+    if (res && res.interfaces && res.interfaces.length > 0) {
+      const customOpt = selectEl.querySelector('option[value="custom"]');
+      res.interfaces.forEach(iface => {
+        if (!selectEl.querySelector(`option[value="${iface.ip}"]`)) {
+          const opt = document.createElement('option');
+          opt.value = iface.ip;
+          opt.textContent = `🔌 ${iface.name} (${iface.ip})`;
+          if (customOpt) {
+            selectEl.insertBefore(opt, customOpt);
+          } else {
+            selectEl.appendChild(opt);
+          }
+        }
+      });
+    }
+  } catch (e) {}
+};
+
+window.handlePingSourceChange = function(selectEl) {
+  const customInput = document.getElementById('ping-source-custom');
+  if (customInput) {
+    if (selectEl.value === 'custom') {
+      customInput.style.display = 'block';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+    }
+  }
+};
+
 // --- Execution Handlers ---
 
 window.executePing = async function() {
   const host = document.getElementById('ping-host')?.value.trim();
   const count = document.getElementById('ping-count')?.value || 4;
+  const sourceSelect = document.getElementById('ping-source-select');
+  let source = '';
+  if (sourceSelect) {
+    if (sourceSelect.value === 'custom') {
+      source = document.getElementById('ping-source-custom')?.value.trim() || '';
+    } else {
+      source = sourceSelect.value.trim();
+    }
+  }
+
   const btn = document.getElementById('btn-run-ping');
   const resArea = document.getElementById('ping-results-area');
 
-  if (!host) { toast.warning('Please enter a host or IP address'); return; }
+  if (!host) { toast.warning('Please enter a target destination host or IP address'); return; }
 
   if (btn) btn.disabled = true;
   if (resArea) {
@@ -321,11 +379,11 @@ window.executePing = async function() {
   }
 
   try {
-    const res = await toolsApi.ping({ host, count });
-    window.toolsState.lastOutput = `[PING TEST: ${res.host}]\nStatus: ${res.is_alive ? 'ALIVE' : 'UNREACHABLE'}\nPacket Loss: ${res.packet_loss_percent}%\nAvg Latency: ${res.avg_latency_ms || '-'} ms\nRaw Output:\n${res.raw_output}`;
+    const res = await toolsApi.ping({ host, count, source: source || undefined });
+    window.toolsState.lastOutput = `[PING TEST: FROM ${res.source || 'Default'} -> TO ${res.host}]\nStatus: ${res.is_alive ? 'ALIVE' : 'UNREACHABLE'}\nPacket Loss: ${res.packet_loss_percent}%\nAvg Latency: ${res.avg_latency_ms || '-'} ms\nCommand Executed: ${res.command_executed || '-'}\nRaw Output:\n${res.raw_output}`;
 
     resArea.innerHTML = `
-      <div class="stats-grid mb-4">
+      <div class="stats-grid mb-4" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr))">
         <div class="stat-card" style="border-left:3px solid ${res.is_alive ? '#10b981' : '#f43f5e'}">
           <div class="stat-icon" style="background:${res.is_alive ? 'rgba(16,185,129,0.12)' : 'rgba(244,63,94,0.12)'};color:${res.is_alive ? '#34d399' : '#fb7185'}">
             ${renderIcon(res.is_alive ? 'check' : 'x')}
@@ -333,6 +391,16 @@ window.executePing = async function() {
           <div class="stat-content">
             <div class="stat-value ${res.is_alive ? 'text-success' : 'text-danger'}">${res.is_alive ? 'ONLINE (ALIVE)' : 'UNREACHABLE'}</div>
             <div class="stat-label">Host Reachability</div>
+          </div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid var(--accent-primary)">
+          <div class="stat-icon" style="background:rgba(99,102,241,0.12);color:var(--accent-primary)">${renderIcon('activity')}</div>
+          <div class="stat-content">
+            <div class="stat-value text-xs font-bold" style="font-size:0.75rem;line-height:1.4">
+              <span class="text-muted">From:</span> <span class="text-primary font-semibold">${escHtml(res.source || 'Default')}</span><br>
+              <span class="text-muted">To:</span> <span class="text-success font-semibold">${escHtml(res.host)}</span>
+            </div>
+            <div class="stat-label">Source ➔ Target Path</div>
           </div>
         </div>
         <div class="stat-card">
@@ -361,7 +429,10 @@ window.executePing = async function() {
       <!-- Raw Terminal Console -->
       <div class="card">
         <div class="card-header py-2 flex items-center justify-between">
-          <span class="card-title text-xs font-semibold">Terminal Output Console</span>
+          <div class="flex items-center gap-2">
+            <span class="card-title text-xs font-semibold">Terminal Output Console</span>
+            ${res.command_executed ? `<span class="badge badge-secondary text-xs" style="font-family:monospace;font-size:0.68rem">$ ${escHtml(res.command_executed)}</span>` : ''}
+          </div>
           <div class="flex gap-2">
             <button class="btn btn-secondary btn-xs" onclick="copyLastOutput()">Copy Output</button>
             <button class="btn btn-primary btn-xs" onclick="showAttachToolOutputModal()">Attach to Ticket</button>

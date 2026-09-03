@@ -216,7 +216,7 @@ function renderBrandingPage(b) {
           <!-- Tab URL Bar Mockup -->
           <div style="background:var(--bg-card);border:1px solid #2d3343;border-top:none;border-radius:0 0 8px 8px;padding:6px 10px;display:flex;align-items:center;gap:6px">
             <span style="color:#10b981;font-size:0.7rem">🔒</span>
-            <span class="font-mono text-xs text-muted" style="font-size:0.68rem;letter-spacing:-0.02em">https://portal.company.com/app.html</span>
+            <span class="font-mono text-xs text-muted" style="font-size:0.68rem;letter-spacing:-0.02em">https://portal.company.com/dashboard</span>
           </div>
         </div>
       </div>

@@ -137,6 +137,38 @@ class ToolsTest extends TestCase
         $this->assertEquals('ITSM Enterprise Security', $decodeRes->json('decoded'));
     }
 
+    public function test_admin_can_get_interfaces()
+    {
+        $res = $this->actingAs($this->admin, 'sanctum')->getJson('/api/tools/interfaces');
+
+        $res->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'interfaces',
+                'os',
+            ]);
+    }
+
+    public function test_admin_can_ping_with_custom_source_address()
+    {
+        $res = $this->actingAs($this->admin, 'sanctum')->postJson('/api/tools/ping', [
+            'host' => '127.0.0.1',
+            'count' => 1,
+            'source' => '127.0.0.1',
+        ]);
+
+        $res->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'host',
+                'source',
+                'is_alive',
+                'packet_loss_percent',
+                'raw_output',
+            ]);
+        $this->assertEquals('127.0.0.1', $res->json('source'));
+    }
+
     public function test_host_sanitization_prevents_command_injection()
     {
         $res = $this->actingAs($this->admin, 'sanctum')->postJson('/api/tools/ping', [
@@ -144,5 +176,12 @@ class ToolsTest extends TestCase
         ]);
 
         $res->assertStatus(422);
+
+        $res2 = $this->actingAs($this->admin, 'sanctum')->postJson('/api/tools/ping', [
+            'host' => '127.0.0.1',
+            'source' => '127.0.0.1; rm -rf /',
+        ]);
+
+        $res2->assertStatus(422);
     }
 }

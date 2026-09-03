@@ -191,6 +191,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // IT Diagnostics & Troubleshooting Tools
     Route::prefix('tools')->group(function () {
+        Route::get('/interfaces', [\App\Http\Controllers\Api\ToolsController::class, 'interfaces']);
         Route::post('/ping', [\App\Http\Controllers\Api\ToolsController::class, 'ping']);
         Route::post('/port-check', [\App\Http\Controllers\Api\ToolsController::class, 'portCheck']);
         Route::post('/traceroute', [\App\Http\Controllers\Api\ToolsController::class, 'traceroute']);

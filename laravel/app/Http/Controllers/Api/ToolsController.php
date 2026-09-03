@@ -47,7 +47,75 @@ class ToolsController extends Controller
     }
 
     /**
-     * 1. Ping & Latency Tester
+     * 0. Get Active Network Interfaces & Server IP Addresses
+     */
+    public function interfaces(Request $request): JsonResponse
+    {
+        if ($deny = $this->checkAccess($request)) return $deny;
+
+        $interfaces = [];
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+
+        if ($isWindows) {
+            @exec('ipconfig', $lines);
+            $currentAdapter = null;
+            foreach ($lines ?? [] as $line) {
+                if (preg_match('/adapter\s+(.+):/i', $line, $m)) {
+                    $currentAdapter = trim($m[1]);
+                } elseif ($currentAdapter && preg_match('/IPv4 Address[^\:]*:\s*([\d\.]+)/i', $line, $m)) {
+                    $interfaces[] = [
+                        'name' => $currentAdapter,
+                        'ip' => $m[1],
+                        'label' => "{$currentAdapter} ({$m[1]})"
+                    ];
+                }
+            }
+        } else {
+            // Linux standard: ip -o -4 addr show
+            @exec('ip -o -4 addr show 2>/dev/null', $lines);
+            if (!empty($lines)) {
+                foreach ($lines as $line) {
+                    if (preg_match('/^\d+:\s+([^\s]+)\s+inet\s+([\d\.]+)/i', $line, $m)) {
+                        $ifName = $m[1];
+                        $ip = $m[2];
+                        if ($ip !== '127.0.0.1') {
+                            $interfaces[] = [
+                                'name' => $ifName,
+                                'ip' => $ip,
+                                'label' => "{$ifName} ({$ip})"
+                            ];
+                        }
+                    }
+                }
+            } else {
+                // Fallback for macOS / BSD: ifconfig
+                @exec('ifconfig 2>/dev/null', $lines);
+                $currentIf = null;
+                foreach ($lines ?? [] as $line) {
+                    if (preg_match('/^([a-zA-Z0-9_\-]+):/i', $line, $m)) {
+                        $currentIf = $m[1];
+                    } elseif ($currentIf && preg_match('/inet\s+([\d\.]+)/i', $line, $m)) {
+                        if ($m[1] !== '127.0.0.1') {
+                            $interfaces[] = [
+                                'name' => $currentIf,
+                                'ip' => $m[1],
+                                'label' => "{$currentIf} ({$m[1]})"
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'interfaces' => $interfaces,
+            'os' => PHP_OS,
+        ]);
+    }
+
+    /**
+     * 1. Ping & Latency Tester with Custom Source Address Support
      */
     public function ping(Request $request): JsonResponse
     {
@@ -56,6 +124,7 @@ class ToolsController extends Controller
         $request->validate([
             'host' => 'required|string|max:255',
             'count' => 'nullable|integer|min:1|max:6',
+            'source' => 'nullable|string|max:100',
         ]);
 
         $host = $this->sanitizeHost($request->input('host'));
@@ -63,14 +132,40 @@ class ToolsController extends Controller
             return response()->json(['success' => false, 'error' => 'Invalid IP address or Hostname format.'], 422);
         }
 
+        $source = $request->input('source');
+        $sourceParam = null;
+        if (!empty($source)) {
+            $source = trim($source);
+            if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || preg_match('/^[a-zA-Z0-9_\-\.]{1,32}$/', $source)) {
+                $sourceParam = $source;
+            } else {
+                return response()->json(['success' => false, 'error' => 'Invalid source IP address or interface name format.'], 422);
+            }
+        }
+
         $count = (int)($request->input('count', 4));
         $escapedHost = escapeshellarg($host);
 
         $startTime = microtime(true);
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        $cmd = $isWindows 
-            ? "ping -n {$count} {$escapedHost}" 
-            : "ping -c {$count} -t 4 {$escapedHost}";
+        $isDarwin = strtoupper(PHP_OS) === 'DARWIN';
+
+        if ($isWindows) {
+            $sourceFlag = $sourceParam ? " -S " . escapeshellarg($sourceParam) : "";
+            $cmd = "ping -n {$count}{$sourceFlag} {$escapedHost}";
+        } elseif ($isDarwin) {
+            if ($sourceParam) {
+                $isIp = filter_var($sourceParam, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+                $sourceFlag = $isIp ? " -S " . escapeshellarg($sourceParam) : " -b " . escapeshellarg($sourceParam);
+            } else {
+                $sourceFlag = "";
+            }
+            $cmd = "ping -c {$count} -t 4{$sourceFlag} {$escapedHost}";
+        } else {
+            // Linux
+            $sourceFlag = $sourceParam ? " -I " . escapeshellarg($sourceParam) : "";
+            $cmd = "ping -c {$count} -W 4{$sourceFlag} {$escapedHost}";
+        }
 
         $output = [];
         $returnCode = 0;
@@ -101,12 +196,14 @@ class ToolsController extends Controller
         return response()->json([
             'success' => true,
             'host' => $host,
+            'source' => $sourceParam ?: 'Default (Auto)',
             'is_alive' => $isAlive,
             'packet_loss_percent' => $packetLoss,
             'avg_latency_ms' => $avgRtt,
             'min_latency_ms' => $minRtt,
             'max_latency_ms' => $maxRtt,
             'execution_time_ms' => $executionTime,
+            'command_executed' => $cmd,
             'raw_output' => $rawOutput,
         ]);
     }
@@ -202,18 +299,34 @@ class ToolsController extends Controller
     {
         if ($deny = $this->checkAccess($request)) return $deny;
 
-        $request->validate(['host' => 'required|string|max:255']);
+        $request->validate([
+            'host' => 'required|string|max:255',
+            'source' => 'nullable|string|max:100',
+        ]);
 
         $host = $this->sanitizeHost($request->input('host'));
         if (!$host) {
             return response()->json(['success' => false, 'error' => 'Invalid IP address or Hostname format.'], 422);
         }
 
+        $source = $request->input('source');
+        $sourceParam = null;
+        if (!empty($source)) {
+            $source = trim($source);
+            if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || preg_match('/^[a-zA-Z0-9_\-\.]{1,32}$/', $source)) {
+                $sourceParam = $source;
+            }
+        }
+
         $escapedHost = escapeshellarg($host);
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        $cmd = $isWindows 
-            ? "tracert -d -h 15 -w 1000 {$escapedHost}" 
-            : "traceroute -m 15 -w 2 -q 1 {$escapedHost} 2>&1";
+        if ($isWindows) {
+            $sourceFlag = $sourceParam ? " -S " . escapeshellarg($sourceParam) : "";
+            $cmd = "tracert -d -h 15 -w 1000{$sourceFlag} {$escapedHost}";
+        } else {
+            $sourceFlag = $sourceParam ? " -s " . escapeshellarg($sourceParam) : "";
+            $cmd = "traceroute -m 15 -w 2 -q 1{$sourceFlag} {$escapedHost} 2>&1";
+        }
 
         $output = [];
         $returnCode = 0;

@@ -206,6 +206,7 @@ window.reportsApi = {
 
 // --- IT Diagnostics & Troubleshooting Tools ---
 window.toolsApi = {
+  interfaces: () => api.get('/tools/interfaces'),
   ping: (data) => api.post('/tools/ping', data),
   portCheck: (data) => api.post('/tools/port-check', data),
   traceroute: (data) => api.post('/tools/traceroute', data),

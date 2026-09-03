@@ -214,8 +214,8 @@
         localStorage.setItem('itsm_token', data.token);
         localStorage.setItem('itsm_user', JSON.stringify(data.user));
 
-        // Redirect to app
-        window.location.href = 'app.html';
+        // Redirect to app with clean URL
+        window.location.href = '/dashboard';
       } catch (err) {
         errEl.textContent = err.message;
         errEl.style.display = 'block';
@@ -227,7 +227,7 @@
 
     // Check if already logged in
     if (localStorage.getItem('itsm_token')) {
-      window.location.href = 'app.html';
+      window.location.href = '/dashboard';
     }
   </script>
 </body>
