@@ -1,5 +1,6 @@
 /**
  * ITSM ENTERPRISE - STRICT ROLE-ISOLATED FEATURES & SYSTEM GUIDE
+ * Pixel-Perfect Spacing & Balanced Margins
  */
 
 window.featuresData = [
@@ -358,13 +359,16 @@ window.loadSystemGuide = function() {
   const permittedFeatures = window.getPermittedFeaturesForRole(userRole);
 
   content.innerHTML = `
-    <div class="page-header" style="margin-bottom:1.25rem">
+    <!-- Page Header with Clean Spacing -->
+    <div class="page-header" style="margin-bottom:1.5rem">
       <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span style="font-size:1.6rem">📖</span>
-          <h1 class="page-title" style="margin:0">Panduan Fitur & Layanan Sistem (${userRole.toUpperCase()})</h1>
+        <div class="flex items-center gap-2.5 mb-1.5">
+          <span style="font-size:1.75rem;line-height:1">📖</span>
+          <h1 class="page-title" style="margin:0;font-size:1.4rem;font-weight:700">Panduan Fitur & Layanan Sistem (${userRole.toUpperCase()})</h1>
         </div>
-        <p class="page-subtitle">Panduan komprehensif mengenai fungsi, manfaat, dan alur kerja fitur yang dapat diakses oleh akun Anda</p>
+        <p class="page-subtitle" style="margin:0;font-size:0.825rem;color:var(--text-muted)">
+          Panduan komprehensif mengenai fungsi, manfaat, dan alur kerja fitur yang dapat diakses oleh akun Anda
+        </p>
       </div>
       <div class="flex gap-2">
         <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">
@@ -374,20 +378,20 @@ window.loadSystemGuide = function() {
       </div>
     </div>
 
-    <!-- Personalized Role Banner -->
-    <div class="card p-3 mb-4" style="background:linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.08) 100%);border:1px solid var(--border-primary)">
+    <!-- Personalized Role Banner with Balanced Margin & Padding -->
+    <div class="card p-4 mb-4" style="background:linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.08) 100%);border:1px solid var(--border-primary);border-radius:12px">
       <div class="flex items-center justify-between flex-wrap gap-3">
-        <div class="flex items-center gap-3">
-          <div style="width:42px;height:42px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:bold;flex-shrink:0">
+        <div class="flex items-center gap-3.5">
+          <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:bold;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,0.25)">
             ${userRole === 'admin' ? '👑' : userRole === 'manager' ? '👔' : userRole === 'agent' ? '🛠️' : '👤'}
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-xs">Peran Akun Anda:</span>
-              <span class="badge badge-primary font-bold text-xs" style="text-transform:uppercase;letter-spacing:0.5px">${userRole.toUpperCase()}</span>
-              <span class="badge badge-success text-xs font-semibold" style="font-size:0.65rem">${permittedFeatures.length} Modul Tersedia</span>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-xs" style="color:var(--text-primary)">Peran Akun Anda:</span>
+              <span class="badge badge-primary font-bold text-xs" style="text-transform:uppercase;letter-spacing:0.5px;padding:0.25rem 0.6rem">${userRole.toUpperCase()}</span>
+              <span class="badge badge-success text-xs font-semibold" style="font-size:0.68rem;padding:0.25rem 0.5rem">${permittedFeatures.length} Modul Tersedia</span>
             </div>
-            <div class="text-xs text-secondary mt-0.5" style="line-height:1.5">
+            <div class="text-xs text-secondary" style="line-height:1.55;font-size:0.78rem">
               ${getRoleGuidanceSummary(userRole)}
             </div>
           </div>
@@ -396,87 +400,87 @@ window.loadSystemGuide = function() {
     </div>
 
     <!-- Interactive Search & Category Filter Toolbar -->
-    <div class="card p-3 mb-4">
+    <div class="card p-3.5 mb-4" style="border-radius:10px;border:1px solid var(--border-primary)">
       <div class="flex items-center justify-between flex-wrap gap-3">
         <!-- Search Input -->
         <div class="form-group mb-0" style="flex:1;min-width:280px;position:relative">
-          <input type="text" class="form-control" id="guide-search-input" placeholder="🔍 Cari kegunaan fitur yang dapat Anda akses..." oninput="filterGuideFeatures()">
+          <input type="text" class="form-control" id="guide-search-input" placeholder="🔍 Cari kegunaan fitur yang dapat Anda akses..." oninput="filterGuideFeatures()" style="padding:0.5rem 0.85rem;font-size:0.8rem">
         </div>
 
         <!-- Filter Category Tabs strictly for the role -->
-        <div class="flex gap-1.5 flex-wrap" id="guide-category-filters">
-          <button class="btn btn-xs btn-primary guide-cat-btn" data-category="all" onclick="filterGuideCategory('all', this)">
+        <div class="flex gap-2 flex-wrap" id="guide-category-filters">
+          <button class="btn btn-xs btn-primary guide-cat-btn" data-category="all" onclick="filterGuideCategory('all', this)" style="padding:0.4rem 0.85rem;border-radius:6px;font-weight:600">
             ${userRole === 'user' ? `Semua Layanan Karyawan (${permittedFeatures.length})` : `Semua Modul Akun (${permittedFeatures.length})`}
           </button>
           
-          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="servicedesk" onclick="filterGuideCategory('servicedesk', this)">
+          <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="servicedesk" onclick="filterGuideCategory('servicedesk', this)" style="padding:0.4rem 0.85rem;border-radius:6px;font-weight:600">
             Service Desk & Katalog
           </button>
 
           ${userRole !== 'user' ? `
-            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="analytics" onclick="filterGuideCategory('analytics', this)">IT Ops & RMM</button>
-            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="itil" onclick="filterGuideCategory('itil', this)">Standar ITIL</button>
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="analytics" onclick="filterGuideCategory('analytics', this)" style="padding:0.4rem 0.85rem;border-radius:6px;font-weight:600">IT Ops & RMM</button>
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="itil" onclick="filterGuideCategory('itil', this)" style="padding:0.4rem 0.85rem;border-radius:6px;font-weight:600">Standar ITIL</button>
           ` : ''}
 
           ${['admin', 'manager'].includes(userRole) ? `
-            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="security" onclick="filterGuideCategory('security', this)">Keamanan & RBAC</button>
-            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="integrations" onclick="filterGuideCategory('integrations', this)">Integrasi</button>
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="security" onclick="filterGuideCategory('security', this)" style="padding:0.4rem 0.85rem;border-radius:6px;font-weight:600">Keamanan & RBAC</button>
+            <button class="btn btn-xs btn-secondary guide-cat-btn" data-category="integrations" onclick="filterGuideCategory('integrations', this)" style="padding:0.4rem 0.85rem;border-radius:6px;font-weight:600">Integrasi</button>
           ` : ''}
         </div>
       </div>
     </div>
 
-    <!-- Feature Cards Grid -->
-    <div id="guide-cards-container" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));gap:1.25rem">
+    <!-- Feature Cards Grid with Generous Gap & Margins -->
+    <div id="guide-cards-container" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));gap:1.5rem;margin-bottom:2rem">
       <!-- Injected via JavaScript -->
     </div>
 
-    <!-- Role Context Footer Section -->
+    <!-- Role Context Footer Section with Clean Margin -->
     ${userRole === 'user' ? `
-      <div class="card p-4 mt-6">
-        <div class="flex items-center gap-2 mb-2">
-          <span style="font-size:1.2rem">💡</span>
-          <span class="card-title text-sm font-bold">Informasi Layanan Mandiri Karyawan</span>
+      <div class="card p-4 mt-5 mb-4" style="border-radius:12px;border:1px solid var(--border-primary);background:var(--bg-card)">
+        <div class="flex items-center gap-2.5 mb-2.5">
+          <span style="font-size:1.3rem">💡</span>
+          <span class="card-title text-sm font-bold" style="margin:0">Informasi Layanan Mandiri Karyawan</span>
         </div>
-        <p class="text-xs text-secondary mb-0" style="line-height:1.6">
+        <p class="text-xs text-secondary mb-0" style="line-height:1.65;font-size:0.8rem">
           Sebagai Karyawan, Anda dapat mengajukan permintaan perangkat baru kapan saja melalui <b>Service Catalog</b>, melaporkan gangguan sistem melalui <b>Create Ticket</b>, dan mencari panduan troubleshooting mandiri di <b>Knowledge Base</b>. 
           Jika membutuhkan bantuan darurat atau eskalasi, silakan hubungi tim IT Support Helpdesk perusahaan.
         </p>
       </div>
     ` : `
-      <div class="card p-4 mt-6">
-        <div class="flex items-center gap-2 mb-3">
-          <span style="font-size:1.2rem">👥</span>
-          <span class="card-title text-sm font-bold">Matriks Hak Akses & Pembagian Peran Pengguna (Role-Based Access Control)</span>
+      <div class="card p-4 mt-5 mb-4" style="border-radius:12px;border:1px solid var(--border-primary)">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span style="font-size:1.3rem">👥</span>
+          <span class="card-title text-sm font-bold" style="margin:0">Matriks Hak Akses & Pembagian Peran Pengguna (Role-Based Access Control)</span>
         </div>
         <div class="table-responsive">
-          <table class="table text-xs">
+          <table class="table text-xs" style="margin:0">
             <thead>
               <tr>
-                <th>Peran (Role)</th>
-                <th>Pengguna Sasaran</th>
-                <th>Modul yang Dapat Diakses</th>
-                <th>Hak Istimewa & Kewenangan</th>
+                <th style="padding:0.75rem 1rem">Peran (Role)</th>
+                <th style="padding:0.75rem 1rem">Pengguna Sasaran</th>
+                <th style="padding:0.75rem 1rem">Modul yang Dapat Diakses</th>
+                <th style="padding:0.75rem 1rem">Hak Istimewa & Kewenangan</th>
               </tr>
             </thead>
             <tbody>
               <tr style="${userRole === 'admin' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-                <td><span class="badge badge-primary font-bold">Admin</span> ${userRole === 'admin' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-                <td>IT Director, System Administrator</td>
-                <td><b>Seluruh 13 Modul:</b> Termasuk Brand Studio, Addons, User Management, dan Audit Security Logs</td>
-                <td><span class="text-success font-bold">✓ Kontrol Penuh</span> (Buat/Hapus User, Force Logout Sesi, Setting SMTP/Telegram, White-Label)</td>
+                <td style="padding:0.75rem 1rem"><span class="badge badge-primary font-bold">Admin</span> ${userRole === 'admin' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
+                <td style="padding:0.75rem 1rem">IT Director, System Administrator</td>
+                <td style="padding:0.75rem 1rem"><b>Seluruh 13 Modul:</b> Termasuk Brand Studio, Addons, User Management, dan Audit Security Logs</td>
+                <td style="padding:0.75rem 1rem"><span class="text-success font-bold">✓ Kontrol Penuh</span> (Buat/Hapus User, Force Logout Sesi, Setting SMTP/Telegram, White-Label)</td>
               </tr>
               <tr style="${userRole === 'manager' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-                <td><span class="badge badge-accent font-bold">Manager</span> ${userRole === 'manager' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-                <td>Helpdesk Lead, Operations Manager</td>
-                <td>Service Desk, KPI Analytics, RMM Devices, CAB Changes, Problems, Assets, KB</td>
-                <td><span class="text-primary font-medium">✓ Otoritas Operasional</span> (Disposisi Tiket, Setujui Perubahan CAB, Pantau Performa Tim)</td>
+                <td style="padding:0.75rem 1rem"><span class="badge badge-accent font-bold">Manager</span> ${userRole === 'manager' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
+                <td style="padding:0.75rem 1rem">Helpdesk Lead, Operations Manager</td>
+                <td style="padding:0.75rem 1rem">Service Desk, KPI Analytics, RMM Devices, CAB Changes, Problems, Assets, KB</td>
+                <td style="padding:0.75rem 1rem"><span class="text-primary font-medium">✓ Otoritas Operasional</span> (Disposisi Tiket, Setujui Perubahan CAB, Pantau Performa Tim)</td>
               </tr>
               <tr style="${userRole === 'agent' ? 'background:rgba(99,102,241,0.08);font-weight:600' : ''}">
-                <td><span class="badge badge-info font-bold">Agent</span> ${userRole === 'agent' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
-                <td>IT Support Technician, Network Engineer</td>
-                <td>Service Desk, Troubleshooting Tools, Knowledge Base, Devices Telemetry</td>
-                <td><span class="text-accent font-medium">✓ Penyelesaian Teknis</span> (Update Tiket, Catatan Teknis Internal, Jalankan Diagnostik)</td>
+                <td style="padding:0.75rem 1rem"><span class="badge badge-info font-bold">Agent</span> ${userRole === 'agent' ? '<span class="text-xs text-primary">(Akun Anda)</span>' : ''}</td>
+                <td style="padding:0.75rem 1rem">IT Support Technician, Network Engineer</td>
+                <td style="padding:0.75rem 1rem">Service Desk, Troubleshooting Tools, Knowledge Base, Devices Telemetry</td>
+                <td style="padding:0.75rem 1rem"><span class="text-accent font-medium">✓ Penyelesaian Teknis</span> (Update Tiket, Catatan Teknis Internal, Jalankan Diagnostik)</td>
               </tr>
             </tbody>
           </table>
@@ -496,10 +500,10 @@ window.renderGuideCards = function(items) {
 
   if (!items || items.length === 0) {
     container.innerHTML = `
-      <div class="p-8 text-center text-muted" style="grid-column:1/-1">
-        <div style="font-size:2.2rem;margin-bottom:0.5rem">🔍</div>
-        <div class="font-bold text-sm">Tidak ditemukan fitur yang cocok</div>
-        <div class="text-xs">Coba gunakan kata kunci pencarian lain atau pilih kategori yang tersedia.</div>
+      <div class="p-8 text-center text-muted" style="grid-column:1/-1;background:var(--bg-card);border:1px solid var(--border-primary);border-radius:12px;padding:3rem 1.5rem">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">🔍</div>
+        <div class="font-bold text-sm" style="margin-bottom:0.35rem">Tidak ditemukan fitur yang cocok</div>
+        <div class="text-xs" style="color:var(--text-muted)">Coba gunakan kata kunci pencarian lain atau pilih kategori yang tersedia.</div>
       </div>
     `;
     return;
@@ -509,67 +513,67 @@ window.renderGuideCards = function(items) {
     const roleTip = (f.roleGuidance && f.roleGuidance[currentRole]) ? f.roleGuidance[currentRole] : f.purpose;
 
     return `
-      <div class="card p-4 feature-card" style="display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--border-primary);border-radius:10px;transition:all 0.2s ease">
+      <div class="card p-4 feature-card" style="display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--border-primary);border-radius:12px;padding:1.35rem;box-shadow:var(--shadow-card);transition:all 0.2s ease;min-height:100%">
         <div>
-          <!-- Card Header -->
-          <div class="flex items-start justify-between gap-2 mb-2.5">
-            <div class="flex items-center gap-2.5">
-              <div style="width:38px;height:38px;border-radius:8px;background:rgba(99,102,241,0.1);color:var(--accent-primary);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">
+          <!-- Card Header with Balanced Margins -->
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="flex items-center gap-3">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.12);color:var(--accent-primary);display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0">
                 ${renderIcon(f.icon)}
               </div>
               <div>
-                <h3 class="font-bold text-sm" style="margin:0;line-height:1.3">${escHtml(f.title)}</h3>
-                <span class="text-muted" style="font-size:0.7rem">${escHtml(f.categoryName)}</span>
+                <h3 class="font-bold text-sm" style="margin:0;line-height:1.3;font-size:0.925rem">${escHtml(f.title)}</h3>
+                <span class="text-muted" style="font-size:0.72rem;display:inline-block;margin-top:2px">${escHtml(f.categoryName)}</span>
               </div>
             </div>
-            <span class="badge font-bold" style="font-size:0.65rem;background:${f.badgeColor}22;color:${f.badgeColor};border:1px solid ${f.badgeColor}44">
+            <span class="badge font-bold" style="font-size:0.65rem;background:${f.badgeColor}22;color:${f.badgeColor};border:1px solid ${f.badgeColor}44;padding:0.25rem 0.5rem;border-radius:6px;flex-shrink:0">
               ${escHtml(f.badge)}
             </span>
           </div>
 
-          <!-- Summary -->
-          <p class="text-xs text-secondary mb-2.5" style="line-height:1.5">
+          <!-- Summary with Comfortable Reading Line Height -->
+          <p class="text-xs text-secondary mb-3" style="line-height:1.6;font-size:0.8rem;margin-bottom:0.85rem">
             ${escHtml(f.summary)}
           </p>
 
           <!-- Panduan Sesuai Peran Anda -->
-          <div class="p-2.5 mb-2" style="background:rgba(99,102,241,0.06);border-radius:6px;border:1px solid rgba(99,102,241,0.2)">
-            <div class="font-bold text-xs text-primary mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1">
+          <div class="p-3 mb-2.5" style="background:rgba(99,102,241,0.06);border-radius:8px;border:1px solid rgba(99,102,241,0.2);padding:0.75rem 0.9rem">
+            <div class="font-bold text-xs text-primary mb-1.5 flex items-center justify-between">
+              <span class="flex items-center gap-1.5">
                 <span>🎯</span>
                 <span>Untuk Anda (${currentRole.toUpperCase()}):</span>
               </span>
-              <span class="badge badge-success text-xs" style="font-size:0.6rem">Akses Aktif</span>
+              <span class="badge badge-success text-xs" style="font-size:0.62rem;padding:0.15rem 0.45rem">Akses Aktif</span>
             </div>
-            <div class="text-xs text-secondary" style="line-height:1.5">
+            <div class="text-xs text-secondary" style="line-height:1.55;font-size:0.78rem">
               ${escHtml(roleTip)}
             </div>
           </div>
 
           <!-- Contoh Kasus Nyata (Scenario Section) -->
-          <div class="p-2.5 mb-3" style="background:rgba(16,185,129,0.05);border-radius:6px;border:1px solid rgba(16,185,129,0.15)">
-            <div class="font-bold text-xs text-success mb-1 flex items-center gap-1">
+          <div class="p-3 mb-3" style="background:rgba(16,185,129,0.05);border-radius:8px;border:1px solid rgba(16,185,129,0.18);padding:0.75rem 0.9rem">
+            <div class="font-bold text-xs text-success mb-1.5 flex items-center gap-1.5">
               <span>💡</span>
               <span>Contoh Kasus Nyata:</span>
             </div>
-            <div class="text-xs text-secondary" style="line-height:1.5">
+            <div class="text-xs text-secondary" style="line-height:1.55;font-size:0.78rem">
               ${escHtml(f.scenario)}
             </div>
           </div>
 
-          <!-- Capabilities List -->
-          <div class="p-2.5 mb-3" style="background:var(--bg-input);border-radius:6px;border:1px solid var(--border-primary)">
-            <div class="font-bold text-xs text-primary mb-1.5" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px">Fitur & Kemampuan Utama:</div>
-            <ul class="text-xs text-secondary mb-0" style="padding-left:1.2rem;line-height:1.6;list-style-type:disc">
-              ${f.capabilities.map(c => `<li>${c}</li>`).join('')}
+          <!-- Capabilities List with Clean Bullet Margins -->
+          <div class="p-3 mb-3.5" style="background:var(--bg-input);border-radius:8px;border:1px solid var(--border-primary);padding:0.75rem 0.9rem">
+            <div class="font-bold text-xs text-primary mb-2" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px">Fitur & Kemampuan Utama:</div>
+            <ul class="text-xs text-secondary mb-0" style="padding-left:1.25rem;margin:0;list-style-type:disc">
+              ${f.capabilities.map((c, i) => `<li style="line-height:1.55;font-size:0.76rem;margin-bottom:${i === f.capabilities.length - 1 ? '0' : '0.35rem'}">${c}</li>`).join('')}
             </ul>
           </div>
         </div>
 
-        <!-- Action Button -->
-        <div class="pt-2 flex items-center justify-between" style="border-top:1px solid var(--border-primary)">
-          <span class="text-xs text-muted" style="font-size:0.7rem">Modul: <code>#${escHtml(f.id)}</code></span>
-          <button class="btn btn-primary btn-xs flex items-center gap-1" onclick="navigateTo('${f.targetPage}')">
+        <!-- Action Button with Proper Top Margin & Clean Spacing -->
+        <div class="pt-3 flex items-center justify-between" style="border-top:1px solid var(--border-primary);margin-top:auto">
+          <span class="text-xs text-muted" style="font-size:0.72rem">Modul: <code>#${escHtml(f.id)}</code></span>
+          <button class="btn btn-primary btn-xs flex items-center gap-1.5" onclick="navigateTo('${f.targetPage}')" style="padding:0.35rem 0.75rem;font-weight:600;border-radius:6px">
             <span>Buka Modul Fitur</span>
             <span>→</span>
           </button>
