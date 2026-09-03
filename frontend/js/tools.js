@@ -124,7 +124,7 @@ function renderNetworkSubTool() {
         <div class="card-header pb-2">
           <div>
             <h3 class="card-title text-sm font-bold">Ping & Latency Tester</h3>
-            <p class="text-xs text-muted">Test reachability, round-trip latency, and packet loss from a specific source interface/IP to a remote destination</p>
+            <p class="text-xs text-muted">Test reachability, round-trip latency, and packet loss from a custom source IP/interface to a remote destination</p>
           </div>
         </div>
         <div class="card-body">
@@ -133,16 +133,12 @@ function renderNetworkSubTool() {
               <label class="form-label text-xs font-semibold">Target Destination (Host / IP) *</label>
               <input type="text" class="form-control" id="ping-host" placeholder="e.g. 1.1.1.1, google.com, or 192.168.1.1" value="1.1.1.1" required>
             </div>
-            <div class="form-group mb-0" style="flex:2;min-width:240px">
+            <div class="form-group mb-0" style="flex:1.5;min-width:200px">
               <label class="form-label text-xs font-semibold flex items-center justify-between">
                 <span>Source Address / Interface</span>
                 <span class="text-muted" style="font-size:0.68rem">(Optional)</span>
               </label>
-              <select class="form-control" id="ping-source-select" onchange="handlePingSourceChange(this)" style="font-size:0.75rem">
-                <option value="">Default (Auto / System Primary IP)</option>
-                <option value="custom">✏️ Custom Specific IP / Interface...</option>
-              </select>
-              <input type="text" class="form-control mt-1.5" id="ping-source-custom" placeholder="e.g. 10.8.0.2, 192.168.1.50, eth0" style="display:none;font-size:0.75rem">
+              <input type="text" class="form-control" id="ping-source" placeholder="e.g. 192.168.1.50, 10.8.0.2, eth0">
             </div>
             <div class="form-group mb-0" style="width:115px">
               <label class="form-label text-xs font-semibold">Ping Count</label>
@@ -172,8 +168,6 @@ function renderNetworkSubTool() {
       <!-- Results Viewport -->
       <div id="ping-results-area" style="display:none"></div>
     `;
-
-    setTimeout(() => window.loadPingInterfaces(), 50);
   } else if (sub === 'port') {
     vp.innerHTML = `
       <div class="card mb-6">
@@ -288,9 +282,16 @@ function renderNetworkSubTool() {
         </div>
         <div class="card-body">
           <form onsubmit="event.preventDefault(); executeTraceroute();" class="flex gap-3 items-end flex-wrap">
-            <div class="form-group mb-0" style="flex:2;min-width:240px">
-              <label class="form-label text-xs font-medium">Target Host / IP *</label>
+            <div class="form-group mb-0" style="flex:2;min-width:230px">
+              <label class="form-label text-xs font-semibold">Target Destination (Host / IP) *</label>
               <input type="text" class="form-control" id="trace-host" placeholder="e.g. 1.1.1.1 or google.com" value="1.1.1.1" required>
+            </div>
+            <div class="form-group mb-0" style="flex:1.5;min-width:200px">
+              <label class="form-label text-xs font-semibold flex items-center justify-between">
+                <span>Source Address / Interface</span>
+                <span class="text-muted" style="font-size:0.68rem">(Optional)</span>
+              </label>
+              <input type="text" class="form-control" id="trace-source" placeholder="e.g. 192.168.1.50, 10.8.0.2, eth0">
             </div>
             <button type="submit" class="btn btn-primary" id="btn-run-trace">
               ${renderIcon('activity')}
@@ -317,55 +318,12 @@ window.handlePortPresetChange = function(val) {
   }
 };
 
-window.loadPingInterfaces = async function() {
-  const selectEl = document.getElementById('ping-source-select');
-  if (!selectEl) return;
-  try {
-    const res = await toolsApi.interfaces();
-    if (res && res.interfaces && res.interfaces.length > 0) {
-      const customOpt = selectEl.querySelector('option[value="custom"]');
-      res.interfaces.forEach(iface => {
-        if (!selectEl.querySelector(`option[value="${iface.ip}"]`)) {
-          const opt = document.createElement('option');
-          opt.value = iface.ip;
-          opt.textContent = `🔌 ${iface.name} (${iface.ip})`;
-          if (customOpt) {
-            selectEl.insertBefore(opt, customOpt);
-          } else {
-            selectEl.appendChild(opt);
-          }
-        }
-      });
-    }
-  } catch (e) {}
-};
-
-window.handlePingSourceChange = function(selectEl) {
-  const customInput = document.getElementById('ping-source-custom');
-  if (customInput) {
-    if (selectEl.value === 'custom') {
-      customInput.style.display = 'block';
-      customInput.focus();
-    } else {
-      customInput.style.display = 'none';
-    }
-  }
-};
-
 // --- Execution Handlers ---
 
 window.executePing = async function() {
   const host = document.getElementById('ping-host')?.value.trim();
   const count = document.getElementById('ping-count')?.value || 4;
-  const sourceSelect = document.getElementById('ping-source-select');
-  let source = '';
-  if (sourceSelect) {
-    if (sourceSelect.value === 'custom') {
-      source = document.getElementById('ping-source-custom')?.value.trim() || '';
-    } else {
-      source = sourceSelect.value.trim();
-    }
-  }
+  const source = document.getElementById('ping-source')?.value.trim() || '';
 
   const btn = document.getElementById('btn-run-ping');
   const resArea = document.getElementById('ping-results-area');
@@ -685,10 +643,11 @@ window.executeDnsLookup = async function() {
 
 window.executeTraceroute = async function() {
   const host = document.getElementById('trace-host')?.value.trim();
+  const source = document.getElementById('trace-source')?.value.trim() || '';
   const btn = document.getElementById('btn-run-trace');
   const resArea = document.getElementById('trace-results-area');
 
-  if (!host) { toast.warning('Please enter a host or IP'); return; }
+  if (!host) { toast.warning('Please enter a target host or IP'); return; }
 
   if (btn) btn.disabled = true;
   if (resArea) {
@@ -697,7 +656,7 @@ window.executeTraceroute = async function() {
   }
 
   try {
-    const res = await toolsApi.traceroute({ host });
+    const res = await toolsApi.traceroute({ host, source: source || undefined });
     window.toolsState.lastOutput = `[TRACEROUTE: ${res.host}]\n${res.raw_output}`;
 
     resArea.innerHTML = `
